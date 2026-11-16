@@ -1,0 +1,65 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "names": {
+      "$name": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['uid','name']) && newData.child('uid').val() === auth.uid && newData.child('name').val().length <= 16"
+      }
+    },
+
+    "users": {
+      ".read": "auth != null",
+      ".indexOn": ["nameLower"],
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.child('name').val().length <= 16"
+      }
+    },
+
+    "invites": {
+      "$toUid": {
+        ".read": "auth != null && auth.uid === $toUid",
+        "$id": {
+          ".write": "auth != null && (auth.uid === $toUid || (!data.exists() && newData.child('fromUid').val() === auth.uid))"
+        }
+      }
+    },
+
+    "rooms": {
+      ".read": "auth != null",
+      "$rid": {
+        ".write": "auth != null && !data.exists() && newData.child('host').val() === auth.uid",
+
+        "members": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid === $uid || root.child('rooms').child($rid).child('host').val() === auth.uid)"
+          }
+        },
+
+        "shots": {
+          "$sid": {
+            ".write": "auth != null && !data.exists() && root.child('rooms').child($rid).child('members').child(auth.uid).exists()",
+            ".validate": "newData.child('by').val() === auth.uid"
+          }
+        },
+
+        "post": {
+          "$seq": {
+            ".write": "auth != null && root.child('rooms').child($rid).child('members').child(auth.uid).exists()"
+          }
+        },
+
+        "status": {
+          ".write": "auth != null && root.child('rooms').child($rid).child('host').val() === auth.uid"
+        },
+        "startAt": {
+          ".write": "auth != null && root.child('rooms').child($rid).child('host').val() === auth.uid"
+        }
+      }
+    }
+  }
+}
