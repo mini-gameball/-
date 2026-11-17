@@ -1,5 +1,5 @@
 // Service worker: ทำให้ติดตั้งลงหน้าจอได้ + เล่นออฟไลน์ได้ (แคชไฟล์เกม)
-const CACHE = 'marble-4.4';
+const CACHE = 'marble-4.5';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon.ico', './favicon-32.png',
@@ -17,7 +17,11 @@ self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
-self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
+const VERSION = '4.5';
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
+  else if (e.data && e.data.type === 'getVersion' && e.ports && e.ports[0]) e.ports[0].postMessage(VERSION);
+});
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   let host = '';
