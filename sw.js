@@ -1,5 +1,5 @@
 // Service worker: ทำให้ติดตั้งลงหน้าจอได้ + เล่นออฟไลน์ได้ (แคชไฟล์เกม)
-const CACHE = 'marble-v39-1';
+const CACHE = 'marble-v40-1';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon.ico', './favicon-32.png',
@@ -17,12 +17,14 @@ self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
+self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   let host = '';
   try { host = new URL(e.request.url).hostname; } catch (err) { }
-  // ปล่อยคำขอ Firebase/Auth ผ่านตรง (realtime ต้องสด) — ยกเว้น gstatic (เป็น SDK สแตติก แคชได้)
-  if (BYPASS.test(host) && host.indexOf('gstatic.com') === -1) return;
+  // ปล่อยคำขอ Firebase/Google ผ่านตรงทั้งหมด — รวม gstatic (SDK) ด้วย
+  // (ห้ามแคช SDK: เคยทำให้ได้ของค้าง/เวอร์ชันไม่ตรงกันตอนอัพเดต แล้วต่อฐานข้อมูลไม่ได้)
+  if (BYPASS.test(host)) return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(resp => {
       const cp = resp.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)).catch(() => {}); return resp;
