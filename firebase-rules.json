@@ -16,13 +16,14 @@
       ".indexOn": ["nameLower"],
       "$uid": {
         ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.child('name').val().length <= 16"
+        ".validate": "!newData.child('name').exists() || (newData.child('name').isString() && newData.child('name').val().length <= 16)"
       }
     },
 
     "invites": {
       "$toUid": {
         ".read": "auth != null && auth.uid === $toUid",
+        ".indexOn": ["status"],
         "$id": {
           ".write": "auth != null && (auth.uid === $toUid || (!data.exists() && newData.child('fromUid').val() === auth.uid))"
         }
