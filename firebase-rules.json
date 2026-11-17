@@ -6,7 +6,7 @@
     "names": {
       "$name": {
         ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)",
+        ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()))",
         ".validate": "newData.hasChildren(['uid','name']) && newData.child('uid').val() === auth.uid && newData.child('name').val().length <= 16"
       }
     },
