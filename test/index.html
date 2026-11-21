@@ -449,24 +449,24 @@
             <button id="resume-btn" class="btn-sub">กลับไปเล่นต่อ</button>
             <button class="btn-sub" onpointerdown="window.game && game.startCoach('offline')">❓ วิธีเล่น</button>
 <style>
-.contact-row{margin:12px 0 2px;padding-top:10px;border-top:1px solid rgba(255,214,150,.18);text-align:center}
-.contact-row .ct-h{font-size:12px;opacity:.75;margin-bottom:8px;letter-spacing:.3px}
-.contact-row .ct-list{display:flex;justify-content:center;gap:22px}
-.contact-row a{display:flex;flex-direction:column;align-items:center;gap:4px;color:inherit;text-decoration:none;font-size:11px;opacity:.9;-webkit-tap-highlight-color:transparent}
-.contact-row .ct-ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 0 0 2px rgba(255,255,255,.12);transition:transform .12s}
-.contact-row a:active .ct-ic{transform:scale(.9)}
-.contact-row .ct-ic svg{width:26px;height:26px;display:block}
+.contact-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 2px;padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.22);border:1px solid rgba(255,214,150,.14)}
+.contact-row .ct-h{font-size:11.5px;opacity:.75;white-space:nowrap;margin:0}
+.contact-row .ct-list{display:flex;gap:8px}
+.contact-row a{display:flex;color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent;padding:3px;margin:-3px}
+.contact-row .ct-ic{width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .12s}
+.contact-row a:active .ct-ic{transform:scale(.88)}
+.contact-row .ct-ic svg{width:14px;height:14px;display:block}
 .contact-row .fb{background:#1877f2}.contact-row .yt{background:#ff0000}.contact-row .tt{background:#111}
 </style>
 <div class="contact-row">
   <div class="ct-h">📣 ติดตาม / ติดต่อเรา</div>
   <div class="ct-list">
     <a href="https://www.facebook.com/mini.gameball.github.io" target="_blank" rel="noopener" aria-label="Facebook">
-      <span class="ct-ic fb"><svg viewBox="0 0 24 24"><path fill="#fff" d="M13.6 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.6V21h3z"/></svg></span>Facebook</a>
+      <span class="ct-ic fb"><svg viewBox="0 0 24 24"><path fill="#fff" d="M13.6 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.6V21h3z"/></svg></span></a>
     <a href="https://www.youtube.com/channel/UCNU67oJ7p_2rlWS4tjKN8Kw" target="_blank" rel="noopener" aria-label="YouTube">
-      <span class="ct-ic yt"><svg viewBox="0 0 24 24"><path fill="#fff" d="M8.8 6.6v10.8l8.9-5.4z"/></svg></span>YouTube</a>
+      <span class="ct-ic yt"><svg viewBox="0 0 24 24"><path fill="#fff" d="M8.8 6.6v10.8l8.9-5.4z"/></svg></span></a>
     <a href="https://www.tiktok.com/@mini.gameball" target="_blank" rel="noopener" aria-label="TikTok">
-      <span class="ct-ic tt"><svg viewBox="0 0 24 24"><g transform="translate(-.7 -.6)"><path fill="#25f4ee" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></g><g transform="translate(.7 .6)"><path fill="#fe2c55" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></g><path fill="#fff" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></svg></span>TikTok</a>
+      <span class="ct-ic tt"><svg viewBox="0 0 24 24"><g transform="translate(-.7 -.6)"><path fill="#25f4ee" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></g><g transform="translate(.7 .6)"><path fill="#fe2c55" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></g><path fill="#fff" d="M14.5 4h2.4c.2 1.6 1.3 2.9 3.1 3.1v2.5c-1.2 0-2.3-.4-3.1-1v5.9c0 3-2.4 5.2-5.2 5.2s-5.2-2.3-5.2-5.1 2.3-5.1 5.2-5.1h.8v2.6h-.8c-1.4 0-2.6 1.1-2.6 2.6s1.2 2.6 2.6 2.6 2.7-1.1 2.7-2.7z"/></svg></span></a>
   </div>
 </div>
 
