@@ -636,5 +636,59 @@ const bc=c;(function(d,e){const ba=c,f=d();while(!![]){try{const g=-parseInt(ba(
     <script>
       if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
     </script>
-    </body>
+    <!-- bell-bubble: ข้อความเด้งจากกระดิ่งเมื่อมีคำเชิญ (add-on, ไม่แตะลอจิกเกม) -->
+<style>
+#bell-bubble{position:fixed;top:calc(env(safe-area-inset-top,0px) + 38px);right:6px;z-index:60;max-width:min(78vw,280px);
+  background:linear-gradient(180deg,#fff3d6,#ffe2a6);color:#4a2306;border:2px solid #e8a23a;border-radius:14px;
+  padding:9px 12px 8px;font:700 14px/1.35 system-ui,-apple-system,"Noto Sans Thai",sans-serif;
+  box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:0;transform:translateY(-8px) scale(.85);transform-origin:calc(100% - 13px) -8px;
+  transition:opacity .25s,transform .3s cubic-bezier(.2,1.6,.4,1);pointer-events:none;cursor:pointer}
+#bell-bubble.show{opacity:1;transform:none;pointer-events:auto}
+#bell-bubble::before{content:"";position:absolute;top:-9px;right:8px;border:8px solid transparent;border-top:0;border-bottom:9px solid #e8a23a}
+#bell-bubble::after{content:"";position:absolute;top:-6px;right:10px;border:6px solid transparent;border-top:0;border-bottom:7px solid #fff3d6}
+#bell-bubble .bb-sub{display:block;font-weight:500;font-size:11.5px;color:#8a4b12;margin-top:2px}
+#bell-btn.bb-ring{animation:bbring .9s ease-in-out 3}
+@keyframes bbring{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-16deg)}45%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}75%{transform:rotate(4deg)}}
+body.bell-seen #bell-dot{display:none!important}
+</style>
+<div id="bell-bubble" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  var SHOW_MS = 5000, PREFIX = '🔔 มีคำเชิญเล่นจาก ';
+  var bub = document.getElementById('bell-bubble'), timer = null;
+  function unesc(s){ return String(s).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&'); }
+  function hide(){ bub.classList.remove('show'); }
+  function show(name){
+    var bell = document.getElementById('bell-btn');
+    bub.textContent = '';
+    var t = document.createElement('span'); t.textContent = '🔔 ' + name + ' ชวนคุณเล่น!';
+    var s = document.createElement('span'); s.className = 'bb-sub'; s.textContent = 'แตะที่นี่หรือกระดิ่งเพื่อตอบรับ';
+    bub.appendChild(t); bub.appendChild(s);
+    document.body.classList.remove('bell-seen');           // คำเชิญใหม่ → จุดแดงกลับมา
+    bub.classList.add('show');
+    if (bell) { bell.classList.remove('bb-ring'); void bell.offsetWidth; bell.classList.add('bb-ring'); }
+    try { if (navigator.vibrate) navigator.vibrate([120, 80, 120]); } catch (e) { }
+    clearTimeout(timer); timer = setTimeout(hide, SHOW_MS);
+  }
+  function check(){
+    var el = document.getElementById('toast'); if (!el) return;
+    var tx = el.textContent || '';
+    if (tx.indexOf(PREFIX) === 0 && tx !== check.last) { show(unesc(tx.slice(PREFIX.length))); el.style.opacity = '0'; }   // ซ่อนแถบข้อความเล็กเดิม ไม่ให้ซ้ำกับฟองกระดิ่ง
+    check.last = tx;
+  }
+  function seen(){ document.body.classList.add('bell-seen'); hide(); }   // เปิดกระดิ่งแล้ว = เห็นแล้ว จุดแดงดับ
+  bub.addEventListener('pointerdown', function(e){ e.preventDefault(); seen(); try { window.game && game.openBell(); } catch (er) { } });
+  function bind(){
+    var el = document.getElementById('toast'), bell = document.getElementById('bell-btn');
+    if (!el || !bell) return setTimeout(bind, 500);
+    new MutationObserver(check).observe(el, { childList: true, characterData: true, subtree: true });
+    // toast จางแล้วข้อความเดิมยังค้าง — ล้างค่า last เมื่อ toast หาย เพื่อให้คำเชิญซ้ำจากคนเดิมเด้งอีกได้
+    new MutationObserver(function(){ if (el.style.opacity === '0') check.last = ''; }).observe(el, { attributes: true, attributeFilter: ['style'] });
+    bell.addEventListener('pointerdown', seen);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+</script>
+
+</body>
 </html>
