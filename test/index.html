@@ -710,5 +710,131 @@ body.bell-seen #bell-dot{display:none!important}
 })();
 </script>
 
+<!-- quickplay: เปิดเกมแล้วเล่นได้ทันที (ไม่ต้องผ่านหน้าตั้งค่า) + ไฟนำทางปุ่มตั้งค่าครั้งแรก (add-on, ไม่แตะฟิสิกส์/ออนไลน์) -->
+<style>
+#settings-btn.qp-glow{animation:qpglow 1.1s ease-in-out infinite;position:relative;z-index:9}
+@keyframes qpglow{0%,100%{box-shadow:0 0 0 2px rgba(255,200,90,.9),0 0 10px 3px rgba(255,170,40,.55)}50%{box-shadow:0 0 0 3px rgba(255,225,140,1),0 0 22px 9px rgba(255,170,40,.85)}}
+#qp-tip{position:fixed;z-index:40;pointer-events:none;background:linear-gradient(180deg,#fff3d6,#ffe2a6);color:#4a2306;border:2px solid #e8a23a;border-radius:10px;
+  padding:4px 11px;font:700 13px/1.3 system-ui,-apple-system,"Noto Sans Thai",sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.45);white-space:nowrap;display:none;animation:qpbob 1.1s ease-in-out infinite}
+#qp-tip::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-7px;border:7px solid transparent;border-bottom:0;border-top:8px solid #e8a23a}
+@keyframes qpbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+</style>
+<div id="qp-tip">ตั้งค่า</div>
+<script>
+(function () {
+  var LS_CFG = 'marble.lastCfg', LS_HINT = 'marble.seenSettingsHint';
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function $(id) { return document.getElementById(id); }
+  function shown(id) { var el = $(id); return !!(el && el.classList.contains('show')); }
+  var G = null, started = false, manualCoachAt = 0;
+
+  // ---------- 1) จำค่าที่เลือกล่าสุด (ธีม/ด่าน/บอท/ความเก่ง) เพื่อเปิดครั้งหน้าเล่นต่อได้ทันที ----------
+  function saveCfg() {
+    if (!G || !G.pending) return;
+    ls(LS_CFG, JSON.stringify({ theme: G.themeKey, stage: String(G.pending.stage), bots: String(G.pending.bots), level: G.pending.level }));
+  }
+  function restoreCfg() {
+    var c = null; try { c = JSON.parse(ls(LS_CFG) || 'null'); } catch (e) { }
+    if (!c) return;
+    ['theme', 'stage', 'bots', 'level'].forEach(function (g) {
+      if (c[g] == null) return;
+      var b = document.querySelector('#settings-modal .opt[data-group="' + g + '"][data-val="' + c[g] + '"]');
+      if (b && !b.classList.contains('sel')) { try { b.click(); } catch (e) { } }
+    });
+  }
+
+  // ---------- 2) เริ่มเกมทันที ----------
+  function quickStart() {
+    if (started || !G) return;
+    if (G.matchStarted || G.online) { started = true; return; }
+    if (shown('welcome-modal') || shown('online-modal') || shown('friends-modal') || shown('room-modal')) return;   // รอผู้เล่นใหม่ตั้งชื่อ / ไม่ทับหน้าออนไลน์
+    if (!shown('settings-modal')) return;
+    try { var ar = sessionStorage.getItem('marble.autoReset'); if (ar && Date.now() - (+ar) < 20000) { started = true; return; } } catch (e) { }   // กำลังเปิดหน้าออนไลน์ต่อให้
+    started = true;
+    restoreCfg();
+    try { G.pending.humans = 1; G.startMatch(); } catch (e) { started = false; return; }
+    setTimeout(maybeHint, 600);
+  }
+
+  // ---------- 3) สอนเล่น: ข้ามขั้น "กดเริ่มเกม" (เพราะเข้าเกมเลย) → รอถึงตาเราแล้วชี้ลูกแก้ว ----------
+  function patchCoach() {
+    var oStart = G.startCoach, oSteps = G.coachSteps;
+    if (!oStart || !oSteps || G._qpPatched) return;
+    G._qpPatched = true;
+    G.coachSteps = function (w) {
+      var q = oSteps.call(this, w);
+      if (this._qpSkipStart && q && q.filter) q = q.filter(function (s) { return s.sel !== '#start-btn'; });
+      return q;
+    };
+    G.startCoach = function (w) {
+      var self = this; w = w || 'offline';
+      var manual = Date.now() - manualCoachAt < 1500;          // กด "❓ วิธีเล่น" เอง = ขั้นตอนเดิม
+      if (w !== 'offline' || manual) return oStart.call(this, w);
+      var t0 = Date.now();
+      (function wait() {
+        var P = self.players && self.players[self.current];
+        if (self.online) return;                               // เข้าออนไลน์ไปแล้ว ไม่สอนซ้อน
+        if (self.state === 'aim' && P && !P.isBot && !shown('settings-modal')) {
+          self._qpSkipStart = true;
+          try { oStart.call(self, w); } finally { self._qpSkipStart = false; }
+          return;
+        }
+        if (Date.now() - t0 < 60000) setTimeout(wait, 150);
+      })();
+    };
+  }
+
+  // ---------- 4) ไฟนำทางปุ่ม ⚙️ + ป้าย "ตั้งค่า" (ครั้งแรกจนกว่าจะกด) ----------
+  var tip = $('qp-tip'), hintOn = false;
+  function placeTip() {
+    var b = $('settings-btn'); if (!hintOn || !b) return;
+    var r = b.getBoundingClientRect();
+    if (!r.width || document.querySelector('.modal.show') || G._coachStep) { tip.style.display = 'none'; }
+    else {
+      tip.style.display = 'block';
+      var w = tip.offsetWidth;
+      tip.style.left = Math.max(6, Math.min(window.innerWidth - w - 6, r.left + r.width / 2 - w / 2)) + 'px';
+      tip.style.top = (r.top - tip.offsetHeight - 12) + 'px';
+    }
+    requestAnimationFrame(placeTip);
+  }
+  function maybeHint() {
+    if (hintOn || ls(LS_HINT)) return;
+    var b = $('settings-btn'); if (!b) return;
+    if (G._coachStep || G._coachQ || (!ls('marble.seenCoach') && !G.online)) { setTimeout(maybeHint, 800); return; }   // ผู้เล่นใหม่: รอสอนดีดจบก่อน ไม่ให้ซ้อนกัน
+    hintOn = true; b.classList.add('qp-glow'); placeTip();
+  }
+  function hintDone() {
+    ls(LS_HINT, '1');
+    if (!hintOn) return;
+    hintOn = false; tip.style.display = 'none';
+    var b = $('settings-btn'); if (b) b.classList.remove('qp-glow');
+  }
+
+  function bind() {
+    G = window.game;
+    if (!G || !G.startMatch || !$('settings-modal')) return setTimeout(bind, 60);
+    patchCoach();
+    var sb = $('start-btn'); if (sb) sb.addEventListener('click', saveCfg, true);
+    var ag = $('again-btn'); if (ag) ag.addEventListener('click', saveCfg, true);
+    var st = $('settings-btn'); if (st) st.addEventListener('pointerdown', hintDone);
+    Array.prototype.forEach.call(document.querySelectorAll('#settings-modal button'), function (b) {
+      if (/วิธีเล่น/.test(b.textContent)) ['pointerdown', 'click'].forEach(function (ev) { b.addEventListener(ev, function () { manualCoachAt = Date.now(); }, true); });
+    });
+    // ผู้เล่นใหม่: ตั้งชื่อ/ข้าม เสร็จ → เข้าเกมทันที
+    var wm = $('welcome-modal');
+    if (wm) new MutationObserver(function () { if (!shown('welcome-modal')) quickStart(); }).observe(wm, { attributes: true, attributeFilter: ['class'] });
+    // ผู้เล่นเดิม: รอเกมบูตเสร็จ (เปิดหน้าตั้งค่า) แล้วเริ่มเลย
+    var t0 = Date.now();
+    (function tryStart() {
+      if (started) return;
+      quickStart();
+      if (!started && Date.now() - t0 < 15000) setTimeout(tryStart, 80);
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+</script>
+
 </body>
 </html>
