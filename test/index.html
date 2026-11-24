@@ -921,6 +921,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
     box.innerHTML = '<span class="d ' + cls + '">' + (real > 0 ? '+' : '') + fmt(real) + ' แต้ม</span> · ' + r.why +
       '<span class="rk">รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
       (rk !== rkBefore && o.pts > before ? '<span class="lvup">' + UP + 'เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
+    try { document.dispatchEvent(new CustomEvent('marble:pts', { detail: { d: r.d, total: o.pts, rank: rk, rankUp: rk !== rkBefore && o.pts > before, win: r.win } })); } catch (e) { }
     renderStrip();
   }
 
@@ -973,6 +974,172 @@ body.qp-welcome #turn-pill{visibility:hidden}
     new MutationObserver(function () { var now = sm.classList.contains('show'); if (now && !wasSm) renderStrip(); wasSm = now; }).observe(sm, { attributes: true, attributeFilter: ['class'] });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+</script>
+<!-- score_fx: ป้ายแต้มเด้งเหนือลูกแก้ว ณ ตอนได้/เสีย + เสียงพากย์เพิ่ม (มีแต้มในคำพากย์ · ติดกันหลายเด้ง · แซงขึ้นนำ · สรุปแต้มตอนจบเกม · เลื่อนขั้น) · ใช้ระบบเสียงเดิมของเกม (เคารพปุ่มปิดเสียงพูด) · add-on ไม่แตะฟิสิกส์ -->
+<style>
+#sfx-layer{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+.sfx-pop{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;pointer-events:none;animation:sfxUp 1.6s ease-out forwards;font-family:inherit}
+.sfx-me{display:flex;align-items:center;gap:6px;padding:5px 14px 5px 8px;border-radius:999px;background:linear-gradient(180deg,#fff3d6,#ffe2a6);color:#4a2306;border:2px solid #e8a23a;box-shadow:0 6px 16px rgba(0,0,0,.45);font-size:14px;font-weight:700}
+.sfx-me b{font-size:19px;font-weight:800;color:#b45309}
+.sfx-hurt{display:flex;align-items:center;gap:6px;padding:5px 14px 5px 10px;border-radius:999px;background:linear-gradient(180deg,#ffe4e4,#ffc9c9);color:#7f1d1d;border:2px solid #ef4444;box-shadow:0 6px 16px rgba(0,0,0,.45);font-size:14px;font-weight:700}
+.sfx-other{display:flex;align-items:center;gap:5px;font-size:16px;font-weight:800;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.85),0 0 2px #000}
+.sfx-other i{width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
+@keyframes sfxUp{0%{opacity:0;transform:translate(-50%,-55%) scale(.55)}12%{opacity:1;transform:translate(-50%,-100%) scale(1.15)}22%{transform:translate(-50%,-100%) scale(1)}72%{opacity:1}100%{opacity:0;transform:translate(-50%,-220%) scale(1)}}
+#over-pts.sfx-in .d{display:inline-block;animation:sfxPop .65s cubic-bezier(.2,1.6,.4,1)}
+#over-pts.sfx-in .d.dn{animation:sfxPop .65s cubic-bezier(.2,1.6,.4,1),sfxShake .45s .55s}
+#over-pts.sfx-in .lvup{animation:sfxPop .7s .9s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes sfxPop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes sfxShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+</style>
+<script>
+(function () {
+  var STAR = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" fill="#f5b52a" stroke="#a8620f" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+  var DROP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+  // คำพากย์เพิ่ม (สุ่มปนกับของเดิม)
+  var ADD = {
+    bless: ['ลงหลุม! รับไปร้อยแต้มเลย', 'ชุบตัวแล้ว บวกร้อยแต้มจ้า'],
+    eat: ['กินแล้ว! รับไปสองร้อยแต้ม', 'โดนเต็มๆ บวกสองร้อยแต้มเลย'],
+    eaten: ['โอ๊ย โดนกิน เสียไปหนึ่งลูก']
+  };
+  var LINES = {
+    streak2: ['สองเด้งติด! มือขึ้นแล้ว', 'ต่อเนื่องเลย ไฟลุกแล้ว!'],
+    streak3: ['สามเด้งติด! ร้อนแรงสุดๆ', 'หยุดไม่อยู่แล้ว เก่งมาก!'],
+    lead: ['แซงขึ้นนำแล้ว!', 'ขึ้นนำแล้ว เยี่ยมมาก!'],
+    endWin: ['ได้เพิ่ม {D} แต้ม! รวมเป็น {T} แต้มแล้ว', 'รับไปเลย {D} แต้ม! ตอนนี้มี {T} แต้ม'],
+    endLose: ['เสีย {D} แต้ม ไม่เป็นไร ตาหน้าเอาคืน', 'หาย {D} แต้ม สู้ใหม่ตาหน้านะ'],
+    rankUp: ['ยินดีด้วย! เลื่อนขั้นเป็น {R} แล้ว']
+  };
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function fill(s, o) { return s.replace(/\{(\w)\}/g, function (m, k) { return o[k] != null ? o[k] : ''; }); }
+  function $(id) { return document.getElementById(id); }
+
+  // ---------- เสียงพากย์ (ต่อคิวหลังเสียงเดิมพูดจบ ไม่พูดทับ) ----------
+  function canSpeak() {
+    try {
+      return typeof voice !== 'undefined' && typeof audio !== 'undefined' && typeof speechSynthesis !== 'undefined' &&
+        audio.mode === 2 && !document.hidden && !(voice.noThai && !voice.hasPack);
+    } catch (e) { return false; }
+  }
+  var q = [], qt = null;
+  function sayAfter(text, mood, delay, endLine) {
+    if (!text || !canSpeak()) return;
+    if (!endLine && window.game && window.game.state === 'over') return; // จบเกมแล้ว เหลือแต่คำสรุป
+    if (q.length > 2) q.shift();
+    q.push({ t: text, m: mood, at: performance.now() + (delay || 450) });
+    if (!qt) qt = setInterval(pump, 120);
+  }
+  function pump() {
+    if (!q.length) { clearInterval(qt); qt = null; return; }
+    var it = q[0], now = performance.now();
+    if (now < it.at) return;
+    var busy = false; try { busy = speechSynthesis.speaking || speechSynthesis.pending; } catch (e) { }
+    if (busy && now - it.at < 6000) return;
+    q.shift();
+    if (now - it.at > 9000 || !canSpeak()) return;
+    try {
+      var moods = (typeof VOICE_LINES !== 'undefined' && VOICE_LINES.moods) || {};
+      voice.speak(it.t, moods[it.m] || {});
+      voice.lastAt = performance.now();
+    } catch (e) { }
+  }
+  function addPools() {
+    try {
+      var P = VOICE_LINES.pools;
+      Object.keys(ADD).forEach(function (k) {
+        if (P[k] && P[k].lines) ADD[k].forEach(function (l) { if (P[k].lines.indexOf(l) < 0) P[k].lines.push(l); });
+      });
+    } catch (e) { }
+  }
+
+  // ---------- ป้ายเด้ง ----------
+  var layer = null;
+  function pop(html, cls, x, y) {
+    if (!layer) { layer = document.createElement('div'); layer.id = 'sfx-layer'; document.body.appendChild(layer); }
+    var el = document.createElement('div'); el.className = 'sfx-pop ' + cls; el.innerHTML = html;
+    var W = innerWidth, H = innerHeight;
+    el.style.left = Math.max(80, Math.min(W - 80, x)) + 'px';
+    el.style.top = Math.max(120, Math.min(H - 150, y)) + 'px';
+    layer.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1700);
+  }
+  function where(G, p, lift) {
+    try {
+      var m = p.marble && p.marble.mesh, cam = G.camera;
+      if (m && cam && window.THREE) {
+        var v = new THREE.Vector3(); m.getWorldPosition(v); v.y += 0.45; v.project(cam);
+        if (v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1) return { x: (v.x + 1) / 2 * innerWidth, y: (1 - v.y) / 2 * innerHeight - (lift || 0) };
+      }
+    } catch (e) { }
+    return { x: innerWidth / 2, y: innerHeight * 0.38 - (lift || 0) };
+  }
+
+  // ---------- ตรวจคะแนน/ชีวิตเปลี่ยน ----------
+  var snapPl = null, snap = [], streak = {}, lastCur = -1;
+  function isMe(G, i) { try { return G.isMe ? !!G.isMe(i) : i === 0; } catch (e) { return false; } }
+  function take(G) { snapPl = G.players; snap = G.players.map(function (p) { return { s: +p.score || 0, l: +p.lives || 0 }; }); streak = {}; }
+  function tick() {
+    var G = window.game; if (!G || !G.players || !G.players.length) return;
+    if (G.players !== snapPl || snap.length !== G.players.length) return take(G);
+    if (G.current !== lastCur) { Object.keys(streak).forEach(function (k) { if (+k !== G.current) streak[k] = 0; }); lastCur = G.current; }
+    G.players.forEach(function (p, i) {
+      var o = snap[i], s = +p.score || 0, l = +p.lives || 0;
+      if (s < o.s || l > o.l) { o.s = s; o.l = l; return; } // เริ่มใหม่/รีเซ็ต
+      var me = isMe(G, i);
+      if (s > o.s) {
+        var d = s - o.s, at = where(G, p, 42);
+        if (me) {
+          var eatN = d % 200 === 0 && d !== 100 ? d / 200 : 0;
+          var lbl = d === 100 ? 'ชุบตัวสำเร็จ!' : (eatN > 1 ? 'กิน ' + eatN + ' ลูก!' : (eatN ? 'กินลูกแก้ว!' : ''));
+          pop(STAR + '<b>+' + d + '</b>' + (lbl ? ' ' + lbl : ''), 'sfx-me', at.x, at.y);
+          // พากย์เพิ่ม: ติดกันหลายเด้ง > แซงขึ้นนำ
+          var wasBehind = snap.some(function (q2, j) { return j !== i && q2.s > o.s; });
+          var leadNow = G.players.every(function (q2, j) { return j === i || (+q2.score || 0) < s; });
+          streak[i] = (streak[i] || 0) + Math.max(1, eatN);
+          if (streak[i] >= 3) sayAfter(pick(LINES.streak3), 'cheerBig');
+          else if (streak[i] === 2) sayAfter(pick(LINES.streak2), 'hype');
+          else if (wasBehind && leadNow) sayAfter(pick(LINES.lead), 'cheer');
+        } else {
+          pop('<i style="background:' + (p.color || '#fff') + '"></i>+' + d, 'sfx-other', at.x, at.y);
+        }
+      }
+      if (l < o.l && me) {
+        var at2 = where(G, p, 42);
+        pop(DROP + (l > 0 ? 'โดนกิน! เหลือ ' + l + ' ลูก' : 'ลูกแก้วหมดแล้ว'), 'sfx-hurt', at2.x, at2.y);
+      }
+      o.s = s; o.l = l;
+    });
+  }
+
+  // ---------- จบเกม: แต้มเด้งนับขึ้น + พากย์สรุปแต้ม ----------
+  document.addEventListener('marble:pts', function (e) {
+    var r = e.detail || {}, box = $('over-pts'); if (!box) return;
+    box.classList.remove('sfx-in'); void box.offsetWidth; box.classList.add('sfx-in');
+    var dEl = box.querySelector('.d'), D = r.d || 0;
+    if (dEl && D) {
+      var t0 = performance.now(), dur = 900, sign = D > 0 ? '+' : '-', A = Math.abs(D);
+      var step = function () {
+        var k = Math.min(1, (performance.now() - t0) / dur), v = Math.round(A * (1 - Math.pow(1 - k, 3)));
+        dEl.textContent = sign + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' แต้ม';
+        if (k < 1) requestAnimationFrame(step);
+        else if (D > 0) { try { if (audio.ok()) audio.ching(audio.now() + 0.02, 0.1); } catch (x) { } }
+      };
+      step();
+    }
+    q.length = 0; // ตัดคำพากย์ระหว่างเกมที่ค้างคิว ให้คำสรุปมาก่อน
+    if (D > 0) sayAfter(fill(pick(LINES.endWin), { D: D, T: r.total }), 'cheer', 600, true);
+    else if (D < 0) sayAfter(fill(pick(LINES.endLose), { D: -D }), 'console', 600, true);
+    if (r.rankUp) sayAfter(fill(pick(LINES.rankUp), { R: r.rank }), 'cheerBig', 700, true);
+  });
+
+  function boot() {
+    if (!window.game || typeof VOICE_LINES === 'undefined') return setTimeout(boot, 150);
+    addPools();
+    setInterval(tick, 100);
+    var G = window.game, o = G.startMatch;
+    if (o && !G._sfxPatched) { G._sfxPatched = true; G.startMatch = function () { q.length = 0; var r = o.apply(this, arguments); try { take(window.game); } catch (e) { } return r; }; }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
 
