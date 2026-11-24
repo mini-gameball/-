@@ -841,7 +841,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
 })();
 </script>
 
-<!-- points_shop: แต้มสะสม (คิดจากผลแพ้ชนะ เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · ไอคอน SVG ตามดีไซน์ ไม่ใช้อีโมจิ · add-on ไม่แตะฟิสิกส์ -->
+<!-- points_shop: แต้มสะสม (= ผลต่างคะแนนในเกม ชนะบวก แพ้ลบ · เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · ไอคอน SVG ตามดีไซน์ ไม่ใช้อีโมจิ · add-on ไม่แตะฟิสิกส์ -->
 <style>
 #pf-strip{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 8px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.22);text-align:left}
 #pf-strip .pf-ball{width:44px;height:44px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,#fff 0 7%,#ffd28a 16%,#f08a24 52%,#7a2f05 100%);box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(0,0,0,.5)}
@@ -869,8 +869,8 @@ body.qp-welcome #turn-pill{visibility:hidden}
 <script>
 (function () {
   var KEY = 'marble.pts';
-  var RANKS = [[0, 'มือใหม่'], [200, 'เด็กลานดิน'], [500, 'ขาประจำ'], [1000, 'มือดีด'], [2000, 'เซียนลูกแก้ว'], [4000, 'เจ้าสนาม']];
-  var MULT = { easy: 1, normal: 2, hard: 3 };
+  // แต้มสะสม = ผลต่างคะแนนในเกม (หลักร้อย แบบที่ผู้เล่นคุ้น) → เกณฑ์ขั้นจึงเป็นหลักพัน-หมื่น
+  var RANKS = [[0, 'มือใหม่'], [2000, 'เด็กลานดิน'], [5000, 'ขาประจำ'], [10000, 'มือดีด'], [25000, 'เซียนลูกแก้ว'], [50000, 'เจ้าสนาม']];
   // ไอคอนจากดีไซน์: เหรียญโลโก้ลูกแก้ว · ถุงร้านค้า · กุญแจ · ลูกศรขึ้น
   var COIN = '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#f5b52a" stroke="#a8620f" stroke-width="1.5"/><circle cx="12" cy="12" r="7.3" fill="#5aa9f5" stroke="#fff3c4" stroke-width="1.2"/><path d="M8.3 13.6c1.6-3.6 5.7-4.5 7.9-1.8" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".85"/><circle cx="9.7" cy="9.5" r="1.4" fill="#fff"/></svg>';
   function BAG(sz) { return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>'; }
@@ -891,21 +891,18 @@ body.qp-welcome #turn-pill{visibility:hidden}
     for (var i = 0; i < G.players.length; i++) { try { if (G.isMe ? G.isMe(i) : i === 0) return i; } catch (e) { } }
     return 0;
   }
+  // ชนะ: + (คะแนนเรา − คะแนนที่ 2) · แพ้: − (คะแนนผู้ชนะ − คะแนนเรา) · เช่น ชนะ 700 ต่อ 500 = +200
   function scoreMatch(G) {
     if (!G || !G.players || !G.players.length) return null;
     var humans = 0; G.players.forEach(function (p) { if (!p.isBot) humans++; });
     if (!G.online && humans > 1) return { skip: 'เล่นหลายคนบนเครื่องเดียว ไม่นับแต้ม' };
+    if (G.players.length < 2) return null;
     var ranked = G.players.slice().sort(function (a, b) { return (a.out - b.out) || (b.score - a.score); });
-    var me = G.players[myIndex(G)], pos = ranked.indexOf(me), n = ranked.length, d, why;
-    if (G.online) {
-      if (pos === 0) { d = 30; why = 'ชนะออนไลน์'; } else if (pos === n - 1) { d = -10; why = 'แพ้ออนไลน์'; } else { d = 5; why = 'อันดับ ' + (pos + 1); }
-    } else {
-      var m = MULT[G.botLevel] || 2, bots = n - 1, lvl = { easy: 'ง่าย', normal: 'ปกติ', hard: 'ยาก' }[G.botLevel] || '';
-      if (pos === 0) { d = Math.round(10 * m * (bots > 1 ? 1.5 : 1)); why = 'ชนะบอทระดับ' + lvl; }
-      else if (pos === n - 1) { d = -5 * m; why = 'แพ้บอทระดับ' + lvl; }
-      else { d = 0; why = 'อันดับ ' + (pos + 1); }
-    }
-    return { d: d, why: why, win: pos === 0 };
+    var me = G.players[myIndex(G)], pos = ranked.indexOf(me);
+    var sc = function (p) { return Math.max(0, Math.round(+p.score || 0)); };
+    var mine = sc(me), win = pos === 0, other = win ? sc(ranked[1]) : sc(ranked[0]);
+    var d = Math.abs(mine - other) * (win ? 1 : -1);
+    return { d: d, why: (win ? 'ชนะ ' : 'แพ้ ') + fmt(mine) + ' ต่อ ' + fmt(other), win: win };
   }
   var counted = false;
   function onOver() {
@@ -919,9 +916,9 @@ body.qp-welcome #turn-pill{visibility:hidden}
     var o = load(), before = o.pts, rkBefore = rankOf(before);
     o.pts = Math.max(0, o.pts + r.d); o.g++; if (r.win) o.w++; else o.l++; if (o.pts > o.best) o.best = o.pts;
     save(o);
-    var real = o.pts - before, cls = real > 0 ? 'up' : (real < 0 ? 'dn' : 'zero');
+    var real = r.d, cls = real > 0 ? 'up' : (real < 0 ? 'dn' : 'zero'); // โชว์ตามผลต่างจริง (ยอดรวมไม่ติดลบ)
     var nx = nextOf(o.pts), rk = rankOf(o.pts);
-    box.innerHTML = '<span class="d ' + cls + '">' + (real > 0 ? '+' : '') + real + ' แต้ม</span> · ' + r.why +
+    box.innerHTML = '<span class="d ' + cls + '">' + (real > 0 ? '+' : '') + fmt(real) + ' แต้ม</span> · ' + r.why +
       '<span class="rk">รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
       (rk !== rkBefore && o.pts > before ? '<span class="lvup">' + UP + 'เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
     renderStrip();
