@@ -841,7 +841,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
 })();
 </script>
 
-<!-- points_shop: แต้มสะสม (= ผลต่างคะแนนในเกม ชนะบวก แพ้ลบ · เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · ไอคอน SVG ตามดีไซน์ ไม่ใช้อีโมจิ · add-on ไม่แตะฟิสิกส์ -->
+<!-- points_shop: แต้มสะสม (= ผลต่างคะแนนในเกม ชนะบวก แพ้ลบ · เก็บในเครื่อง) + แถบแต้มมุมขวาบน + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · ไอคอน SVG ตามดีไซน์ ไม่ใช้อีโมจิ · add-on ไม่แตะฟิสิกส์ -->
 <style>
 #pf-strip{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 8px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.22);text-align:left}
 #pf-strip .pf-ball{width:44px;height:44px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,#fff 0 7%,#ffd28a 16%,#f08a24 52%,#7a2f05 100%);box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(0,0,0,.5)}
@@ -860,6 +860,17 @@ body.qp-welcome #turn-pill{visibility:hidden}
 #shop-btn{position:relative;width:40px;height:40px;padding:0;border-radius:50%;border:2px solid #ffe1a6;background:linear-gradient(#d6873b,#8c4711);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.45);opacity:.5;cursor:pointer;font-family:inherit}
 #shop-btn:active{transform:scale(.9)}
 #shop-btn .lk{position:absolute;right:-4px;bottom:-4px;width:17px;height:17px;border-radius:50%;background:#1a0c03;border:1px solid #ffe1a6;display:flex;align-items:center;justify-content:center}
+#pts-bar{position:absolute;top:calc(var(--sat,0px) + 86px);right:calc(var(--sar,0px) + 8px);z-index:3;pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:84px;padding:5px 11px 6px 8px;border-radius:13px;background:var(--glass,rgba(18,10,4,.4));border:1px solid rgba(251,191,36,.75);box-shadow:0 0 0 1px rgba(251,191,36,.22),0 4px 12px rgba(0,0,0,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:0;transform:translateY(-140px);transition:opacity .25s;-webkit-tap-highlight-color:transparent}
+#pts-bar.in{animation:pbDrop .75s cubic-bezier(.2,1.45,.45,1) forwards}
+#pts-bar.cover{opacity:0!important;pointer-events:none}
+@keyframes pbDrop{0%{opacity:0;transform:translateY(-140px)}55%{opacity:1}100%{opacity:1;transform:none}}
+#pts-bar .pb-top{display:flex;align-items:center;gap:5px;line-height:1}
+#pts-bar .pb-n{font-weight:800;font-size:15px;color:#fcd34d;display:inline-block}
+#pts-bar .pb-u{font-size:10px;font-weight:600;color:var(--txt,#fdebd0);opacity:.75}
+#pts-bar .pb-bar{height:4px;border-radius:999px;background:rgba(0,0,0,.45);overflow:hidden}
+#pts-bar .pb-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#fcd34d);transition:width .7s}
+#pts-bar .pb-n.bump{animation:pbBump .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pbBump{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
 #over-pts{margin:6px 0 2px;padding:7px 10px;border-radius:11px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.25);text-align:center;font-size:13px}
 #over-pts .d{font-size:18px;font-weight:800}
 #over-pts .up{color:#86efac}#over-pts .dn{color:#fca5a5}#over-pts .zero{color:#fde68a}
@@ -922,7 +933,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
       '<span class="rk">รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
       (rk !== rkBefore && o.pts > before ? '<span class="lvup">' + UP + 'เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
     try { document.dispatchEvent(new CustomEvent('marble:pts', { detail: { d: r.d, total: o.pts, rank: rk, rankUp: rk !== rkBefore && o.pts > before, win: r.win } })); } catch (e) { }
-    renderStrip();
+    renderStrip(); updateBar(true);
   }
 
   // ---------- แถบโปรไฟล์ในเมนู (ตามดีไซน์ Menu) ----------
@@ -948,6 +959,39 @@ body.qp-welcome #turn-pill{visibility:hidden}
       '<div class="pf-soon" role="button" aria-label="เหรียญ (เร็วๆ นี้)"><div class="pf-coin">' + COIN + '—</div><span class="lbl">เร็วๆ นี้</span></div>';
   }
 
+
+  // ---------- แถบแต้มสะสม มุมขวาบน (เลื่อนลงมาตอนเริ่มเกม · อยู่ใต้การ์ดผู้เล่น/แถบตา/ข้อความแจ้ง ไม่ซ้อนกัน) ----------
+  var STAR = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" fill="#f5b52a" stroke="#a8620f" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+  var barShown = false, barVal = null, barNeed = true;
+  function barPct(p) { var i = rankIdx(p), nx = nextOf(p), lo = RANKS[i][0]; return nx ? Math.max(0, Math.min(100, (p - lo) * 100 / (nx[0] - lo))) : 100; }
+  function ensureBar() {
+    var b = $('pts-bar'); if (b) return b;
+    var hud = $('hud'); if (!hud) return null;
+    b = document.createElement('div'); b.id = 'pts-bar'; b.setAttribute('role', 'button'); b.setAttribute('aria-label', 'แต้มสะสม');
+    b.innerHTML = '<div class="pb-top">' + STAR + '<span class="pb-n">0</span><span class="pb-u">แต้ม</span></div><div class="pb-bar"><i></i></div>';
+    b.addEventListener('click', function (e) {
+      e.stopPropagation(); var p = load().pts, nx = nextOf(p);
+      try { game.toast(rankOf(p) + ' · ' + fmt(p) + ' แต้ม' + (nx ? ' · อีก ' + fmt(nx[0] - p) + ' ถึง ' + nx[1] : ' · ขั้นสูงสุด')); } catch (x) { }
+    });
+    ['touchstart', 'mousedown', 'pointerdown'].forEach(function (ev) { b.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true }); });
+    hud.appendChild(b); return b;
+  }
+  function updateBar(animate) {
+    var b = ensureBar(); if (!b) return;
+    var p = load().pts, n = b.querySelector('.pb-n'), from = barVal == null ? p : barVal;
+    b.querySelector('.pb-bar i').style.width = barPct(p) + '%';
+    barVal = p;
+    if (!animate || from === p) { n.textContent = fmt(p); return; }
+    var t0 = performance.now(), dur = 900;
+    (function step() { var k = Math.min(1, (performance.now() - t0) / dur); n.textContent = fmt(Math.round(from + (p - from) * (1 - Math.pow(1 - k, 3)))); if (k < 1) requestAnimationFrame(step); else { n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); } })();
+  }
+  function barTick() {
+    var G = window.game, b = ensureBar(); if (!G || !b) return;
+    var inGame = !!G.matchStarted && !document.body.classList.contains('qp-welcome');
+    if (inGame && (!barShown || barNeed)) { barShown = true; barNeed = false; updateBar(false); b.classList.remove('in'); void b.offsetWidth; b.classList.add('in'); }
+    else if (!inGame && barShown) { barShown = false; b.classList.remove('in'); }
+    var bb = $('bell-bubble'); b.classList.toggle('cover', !!(bb && bb.classList.contains('show')));
+  }
   function bind() {
     var G = window.game, ov = $('over-modal'), sm = $('settings-modal'), bar = $('hud-bottom');
     if (!G || !ov || !sm || !bar) return setTimeout(bind, 100);
@@ -961,6 +1005,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
       var st = $('settings-btn'); bar.insertBefore(sb, st ? st.nextSibling : bar.firstChild);
     }
     renderStrip();
+    ensureBar(); setInterval(barTick, 250);
     var wasOver = ov.classList.contains('show');
     new MutationObserver(function () {
       var now = ov.classList.contains('show');
@@ -969,7 +1014,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
     }).observe(ov, { attributes: true, attributeFilter: ['class'] });
     // เริ่มเกมใหม่ = นับแต้มได้อีกครั้ง
     var oStart = G.startMatch;
-    if (oStart && !G._ptsPatched) { G._ptsPatched = true; G.startMatch = function () { counted = false; return oStart.apply(this, arguments); }; }
+    if (oStart && !G._ptsPatched) { G._ptsPatched = true; G.startMatch = function () { counted = false; barNeed = true; return oStart.apply(this, arguments); }; }
     var wasSm = false;
     new MutationObserver(function () { var now = sm.classList.contains('show'); if (now && !wasSm) renderStrip(); wasSm = now; }).observe(sm, { attributes: true, attributeFilter: ['class'] });
   }
