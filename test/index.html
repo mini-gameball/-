@@ -841,42 +841,50 @@ body.qp-welcome #turn-pill{visibility:hidden}
 })();
 </script>
 
-<!-- points_shop: แต้มสะสม (คิดจากผลแพ้ชนะ เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · add-on ไม่แตะฟิสิกส์ -->
+<!-- points_shop: แต้มสะสม (คิดจากผลแพ้ชนะ เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · ไอคอน SVG ตามดีไซน์ ไม่ใช้อีโมจิ · add-on ไม่แตะฟิสิกส์ -->
 <style>
-#pf-strip{display:flex;align-items:center;gap:9px;padding:8px 10px;margin:0 0 8px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.22)}
-#pf-strip .pf-ball{width:38px;height:38px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,#fff 0 7%,#ffd28a 16%,#f08a24 52%,#7a2f05 100%);box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(0,0,0,.5)}
-#pf-strip .pf-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-#pf-strip .pf-name{font-weight:800;font-size:14.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pf-strip .pf-rank{display:inline-block;font-size:10px;font-weight:700;color:#1a0c03;background:#fbbf24;border-radius:6px;padding:0 5px;line-height:15px;margin-left:5px;vertical-align:2px}
-#pf-strip .pf-pts{font-size:12px;color:#fcd34d;font-weight:700}
-#pf-strip .pf-pts small{color:var(--txt,#fdebd0);opacity:.65;font-weight:400}
-#pf-strip .pf-soon{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.42;filter:grayscale(.55);flex:none}
-#pf-strip .pf-coin{display:flex;align-items:center;gap:4px;padding:3px 9px 3px 4px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid #e8a23a;color:#fcd34d;font-weight:800;font-size:13px}
-#pf-strip .pf-soon span.lbl{font-size:9.5px;letter-spacing:.3px}
-#pf-shop{width:100%;margin:0 0 6px;padding:8px;border-radius:11px;border:1px dashed rgba(255,214,150,.4);background:rgba(255,255,255,.04);color:var(--txt,#fdebd0);font-family:inherit;font-size:12.5px;opacity:.55;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
-#pf-shop b{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:#fcd34d}
-#shop-btn{position:relative;opacity:.38}
-#shop-btn .lk{position:absolute;right:-3px;bottom:-3px;font-size:10px;line-height:1;background:#1a0c03;border-radius:50%;padding:2px}
+#pf-strip{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 8px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.22);text-align:left}
+#pf-strip .pf-ball{width:44px;height:44px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,#fff 0 7%,#ffd28a 16%,#f08a24 52%,#7a2f05 100%);box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(0,0,0,.5)}
+#pf-strip .pf-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+#pf-strip .pf-top{display:flex;align-items:center;gap:6px;min-width:0}
+#pf-strip .pf-name{font-weight:800;font-size:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#pf-strip .pf-rank{flex:none;font-size:10.5px;font-weight:700;color:#1a0c03;background:#fbbf24;border-radius:6px;padding:0 5px;line-height:16px;white-space:nowrap}
+#pf-strip .pf-bar{height:7px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);overflow:hidden}
+#pf-strip .pf-bar i{display:block;height:100%;background:linear-gradient(90deg,#f59e0b,#fcd34d)}
+#pf-strip .pf-sub{font-size:10.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pf-strip .pf-soon{display:flex;flex-direction:column;align-items:center;gap:3px;flex:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#pf-strip .pf-coin{display:flex;align-items:center;gap:5px;padding:5px 10px 5px 6px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid #e8a23a;color:#fcd34d;font-weight:800;font-size:14px;opacity:.45}
+#pf-strip .pf-soon .lbl{font-size:9.5px;opacity:.6;white-space:nowrap}
+#pf-shop{position:relative;width:100%;margin:0 0 8px;padding:10px 8px;border-radius:12px;border:1px solid #ffe1a6;background:linear-gradient(#d6873b,#8c4711);color:#fff;font-family:inherit;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;opacity:.5}
+#pf-shop .tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,225,166,.6);color:#ffe1a6}
+#shop-btn{position:relative;width:40px;height:40px;padding:0;border-radius:50%;border:2px solid #ffe1a6;background:linear-gradient(#d6873b,#8c4711);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.45);opacity:.5;cursor:pointer;font-family:inherit}
+#shop-btn:active{transform:scale(.9)}
+#shop-btn .lk{position:absolute;right:-4px;bottom:-4px;width:17px;height:17px;border-radius:50%;background:#1a0c03;border:1px solid #ffe1a6;display:flex;align-items:center;justify-content:center}
 #over-pts{margin:6px 0 2px;padding:7px 10px;border-radius:11px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.25);text-align:center;font-size:13px}
 #over-pts .d{font-size:18px;font-weight:800}
 #over-pts .up{color:#86efac}#over-pts .dn{color:#fca5a5}#over-pts .zero{color:#fde68a}
 #over-pts .rk{display:block;font-size:11.5px;opacity:.8;margin-top:1px}
-#over-pts .lvup{display:block;color:#fcd34d;font-weight:700;margin-top:2px}
+#over-pts .lvup{display:inline-flex;align-items:center;gap:4px;color:#fcd34d;font-weight:700;margin-top:3px}
 </style>
 <script>
 (function () {
   var KEY = 'marble.pts';
   var RANKS = [[0, 'มือใหม่'], [200, 'เด็กลานดิน'], [500, 'ขาประจำ'], [1000, 'มือดีด'], [2000, 'เซียนลูกแก้ว'], [4000, 'เจ้าสนาม']];
   var MULT = { easy: 1, normal: 2, hard: 3 };
-  var COIN = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#f5b52a" stroke="#a8620f" stroke-width="1.5"/><circle cx="12" cy="12" r="7.3" fill="#5aa9f5" stroke="#fff3c4" stroke-width="1.2"/><circle cx="9.7" cy="9.5" r="1.4" fill="#fff"/></svg>';
+  // ไอคอนจากดีไซน์: เหรียญโลโก้ลูกแก้ว · ถุงร้านค้า · กุญแจ · ลูกศรขึ้น
+  var COIN = '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#f5b52a" stroke="#a8620f" stroke-width="1.5"/><circle cx="12" cy="12" r="7.3" fill="#5aa9f5" stroke="#fff3c4" stroke-width="1.2"/><path d="M8.3 13.6c1.6-3.6 5.7-4.5 7.9-1.8" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".85"/><circle cx="9.7" cy="9.5" r="1.4" fill="#fff"/></svg>';
+  function BAG(sz) { return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>'; }
+  var LOCK = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffe1a6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>';
+  var UP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
   function $(id) { return document.getElementById(id); }
   function load() { try { var o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && typeof o.pts === 'number') return o; } catch (e) { } return { pts: 0, w: 0, l: 0, g: 0, best: 0 }; }
   function save(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { } }
-  function rankOf(p) { var r = RANKS[0][1]; for (var i = 0; i < RANKS.length; i++) if (p >= RANKS[i][0]) r = RANKS[i][1]; return r; }
-  function nextOf(p) { for (var i = 0; i < RANKS.length; i++) if (p < RANKS[i][0]) return RANKS[i]; return null; }
+  function rankIdx(p) { var r = 0; for (var i = 0; i < RANKS.length; i++) if (p >= RANKS[i][0]) r = i; return r; }
+  function rankOf(p) { return RANKS[rankIdx(p)][1]; }
+  function nextOf(p) { var i = rankIdx(p) + 1; return i < RANKS.length ? RANKS[i] : null; }
   function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function soonToast() { try { window.game && game.toast('🛍️ ร้านค้าและเหรียญเปิดเร็วๆ นี้ — ตอนนี้เก็บแต้มไว้ก่อน'); } catch (e) { } }
+  function soonToast() { try { window.game && game.toast('ร้านค้าและเหรียญเปิดเร็วๆ นี้ — ตอนนี้เก็บแต้มไว้ก่อน'); } catch (e) { } }
 
   // ---------- คิดแต้มเมื่อจบเกม ----------
   function myIndex(G) {
@@ -914,36 +922,41 @@ body.qp-welcome #turn-pill{visibility:hidden}
     var real = o.pts - before, cls = real > 0 ? 'up' : (real < 0 ? 'dn' : 'zero');
     var nx = nextOf(o.pts), rk = rankOf(o.pts);
     box.innerHTML = '<span class="d ' + cls + '">' + (real > 0 ? '+' : '') + real + ' แต้ม</span> · ' + r.why +
-      '<span class="rk">🏆 รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
-      (rk !== rkBefore && o.pts > before ? '<span class="lvup">🎉 เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
+      '<span class="rk">รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
+      (rk !== rkBefore && o.pts > before ? '<span class="lvup">' + UP + 'เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
     renderStrip();
   }
 
-  // ---------- แถบโปรไฟล์ในเมนู ----------
+  // ---------- แถบโปรไฟล์ในเมนู (ตามดีไซน์ Menu) ----------
   function renderStrip() {
     var card = document.querySelector('#settings-modal .card'); if (!card) return;
     var s = $('pf-strip');
     if (!s) {
       s = document.createElement('div'); s.id = 'pf-strip'; card.insertBefore(s, card.firstChild);
-      var b = document.createElement('button'); b.id = 'pf-shop'; b.type = 'button';
-      b.innerHTML = '🛍️ ร้านค้า · ลูกแก้ว · ลายสัก <b>เร็วๆ นี้</b>';
+      s.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.pf-soon')) { e.stopPropagation(); soonToast(); } });
+      var b = document.createElement('button'); b.id = 'pf-shop'; b.type = 'button'; b.setAttribute('aria-label', 'ร้านค้า (เร็วๆ นี้)');
+      b.innerHTML = BAG(20) + 'ร้านค้า<span class="tag">เร็วๆ นี้</span>';
       b.addEventListener('click', function (e) { e.stopPropagation(); soonToast(); });
       card.insertBefore(b, s.nextSibling);
     }
     var o = load(), name = ''; try { name = localStorage.getItem('marble.online.name') || ''; } catch (e) { }
+    var i = rankIdx(o.pts), nx = nextOf(o.pts), lo = RANKS[i][0];
+    var pct = nx ? Math.max(0, Math.min(100, Math.round((o.pts - lo) * 100 / (nx[0] - lo)))) : 100;
+    var sub = nx ? fmt(o.pts) + ' / ' + fmt(nx[0]) + ' แต้ม ถึง ' + nx[1] : fmt(o.pts) + ' แต้ม · ขั้นสูงสุด';
     s.innerHTML = '<div class="pf-ball" aria-hidden="true"></div>' +
-      '<div class="pf-mid"><div class="pf-name">' + esc(name || 'ผู้เล่น') + '<span class="pf-rank">' + rankOf(o.pts) + '</span></div>' +
-      '<div class="pf-pts">🏆 ' + fmt(o.pts) + ' แต้ม <small>· ชนะ ' + o.w + ' / ' + o.g + ' เกม</small></div></div>' +
-      '<div class="pf-soon" title="เหรียญเปิดเร็วๆ นี้"><div class="pf-coin">' + COIN + '—</div><span class="lbl">เหรียญ · เร็วๆ นี้</span></div>';
+      '<div class="pf-mid"><div class="pf-top"><span class="pf-name">' + esc(name || 'ผู้เล่น') + '</span><span class="pf-rank">' + RANKS[i][1] + '</span></div>' +
+      '<div class="pf-bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="pf-sub">' + sub + ' · ชนะ ' + o.w + '/' + o.g + '</div></div>' +
+      '<div class="pf-soon" role="button" aria-label="เหรียญ (เร็วๆ นี้)"><div class="pf-coin">' + COIN + '—</div><span class="lbl">เร็วๆ นี้</span></div>';
   }
 
   function bind() {
     var G = window.game, ov = $('over-modal'), sm = $('settings-modal'), bar = $('hud-bottom');
     if (!G || !ov || !sm || !bar) return setTimeout(bind, 100);
-    // ปุ่มร้านค้าจางในแถบล่าง (ต่อจากปุ่มตั้งค่า)
+    // ปุ่มร้านค้า (ถุงทอง ตามดีไซน์) แบบจาง + กุญแจ ในแถบล่าง ต่อจากปุ่มตั้งค่า
     if (!$('shop-btn')) {
-      var sb = document.createElement('button'); sb.id = 'shop-btn'; sb.className = 'ghost-btn'; sb.title = 'ร้านค้า (เร็วๆ นี้)';
-      sb.innerHTML = '🛍️<span class="lk">🔒</span>';
+      var sb = document.createElement('button'); sb.id = 'shop-btn'; sb.type = 'button'; sb.title = 'ร้านค้า (เร็วๆ นี้)'; sb.setAttribute('aria-label', 'ร้านค้า (เร็วๆ นี้)');
+      sb.innerHTML = BAG(20) + '<span class="lk">' + LOCK + '</span>';
       sb.addEventListener('click', function (e) { e.stopPropagation(); soonToast(); });
       sb.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
       sb.addEventListener('mousedown', function (e) { e.stopPropagation(); });
