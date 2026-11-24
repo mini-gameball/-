@@ -976,15 +976,12 @@ body.qp-welcome #turn-pill{visibility:hidden}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
 })();
 </script>
-<!-- score_fx: ป้ายแต้มเด้งเหนือลูกแก้ว ณ ตอนได้/เสีย + เสียงพากย์เพิ่ม (มีแต้มในคำพากย์ · ติดกันหลายเด้ง · แซงขึ้นนำ · สรุปแต้มตอนจบเกม · เลื่อนขั้น) · ใช้ระบบเสียงเดิมของเกม (เคารพปุ่มปิดเสียงพูด) · add-on ไม่แตะฟิสิกส์ -->
+<!-- score_fx: ตัวเลขแต้มเด้งเหนือลูกแก้ว (ตัวเลขล้วน ไม่มีการ์ด/คำ) + เสียงพากย์เพิ่ม (มีแต้มในคำพากย์ · ติดกันหลายเด้ง · แซงขึ้นนำ · สรุปแต้มตอนจบเกม · เลื่อนขั้น) · ใช้ระบบเสียงเดิมของเกม (เคารพปุ่มปิดเสียงพูด) · add-on ไม่แตะฟิสิกส์ -->
 <style>
 #sfx-layer{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
 .sfx-pop{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;pointer-events:none;animation:sfxUp 1.6s ease-out forwards;font-family:inherit}
-.sfx-me{display:flex;align-items:center;gap:6px;padding:5px 14px 5px 8px;border-radius:999px;background:linear-gradient(180deg,#fff3d6,#ffe2a6);color:#4a2306;border:2px solid #e8a23a;box-shadow:0 6px 16px rgba(0,0,0,.45);font-size:14px;font-weight:700}
-.sfx-me b{font-size:19px;font-weight:800;color:#b45309}
-.sfx-hurt{display:flex;align-items:center;gap:6px;padding:5px 14px 5px 10px;border-radius:999px;background:linear-gradient(180deg,#ffe4e4,#ffc9c9);color:#7f1d1d;border:2px solid #ef4444;box-shadow:0 6px 16px rgba(0,0,0,.45);font-size:14px;font-weight:700}
-.sfx-other{display:flex;align-items:center;gap:5px;font-size:16px;font-weight:800;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.85),0 0 2px #000}
-.sfx-other i{width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
+.sfx-me{font-size:28px;font-weight:800;color:#fcd34d;letter-spacing:.5px;-webkit-text-stroke:1px #7a3a06;text-shadow:0 2px 0 #7a3a06,0 3px 8px rgba(0,0,0,.75)}
+.sfx-other{font-size:19px;font-weight:800;color:#fff;-webkit-text-stroke:.6px rgba(0,0,0,.6);text-shadow:0 2px 4px rgba(0,0,0,.85)}
 @keyframes sfxUp{0%{opacity:0;transform:translate(-50%,-55%) scale(.55)}12%{opacity:1;transform:translate(-50%,-100%) scale(1.15)}22%{transform:translate(-50%,-100%) scale(1)}72%{opacity:1}100%{opacity:0;transform:translate(-50%,-220%) scale(1)}}
 #over-pts.sfx-in .d{display:inline-block;animation:sfxPop .65s cubic-bezier(.2,1.6,.4,1)}
 #over-pts.sfx-in .d.dn{animation:sfxPop .65s cubic-bezier(.2,1.6,.4,1),sfxShake .45s .55s}
@@ -994,8 +991,6 @@ body.qp-welcome #turn-pill{visibility:hidden}
 </style>
 <script>
 (function () {
-  var STAR = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" fill="#f5b52a" stroke="#a8620f" stroke-width="1.3" stroke-linejoin="round"/></svg>';
-  var DROP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
   // คำพากย์เพิ่ม (สุ่มปนกับของเดิม)
   var ADD = {
     bless: ['ลงหลุม! รับไปร้อยแต้มเลย', 'ชุบตัวแล้ว บวกร้อยแต้มจ้า'],
@@ -1090,8 +1085,7 @@ body.qp-welcome #turn-pill{visibility:hidden}
         var d = s - o.s, at = where(G, p, 42);
         if (me) {
           var eatN = d % 200 === 0 && d !== 100 ? d / 200 : 0;
-          var lbl = d === 100 ? 'ชุบตัวสำเร็จ!' : (eatN > 1 ? 'กิน ' + eatN + ' ลูก!' : (eatN ? 'กินลูกแก้ว!' : ''));
-          pop(STAR + '<b>+' + d + '</b>' + (lbl ? ' ' + lbl : ''), 'sfx-me', at.x, at.y);
+          pop('+' + d, 'sfx-me', at.x, at.y);
           // พากย์เพิ่ม: ติดกันหลายเด้ง > แซงขึ้นนำ
           var wasBehind = snap.some(function (q2, j) { return j !== i && q2.s > o.s; });
           var leadNow = G.players.every(function (q2, j) { return j === i || (+q2.score || 0) < s; });
@@ -1100,12 +1094,8 @@ body.qp-welcome #turn-pill{visibility:hidden}
           else if (streak[i] === 2) sayAfter(pick(LINES.streak2), 'hype');
           else if (wasBehind && leadNow) sayAfter(pick(LINES.lead), 'cheer');
         } else {
-          pop('<i style="background:' + (p.color || '#fff') + '"></i>+' + d, 'sfx-other', at.x, at.y);
+          pop('+' + d, 'sfx-other', at.x, at.y);
         }
-      }
-      if (l < o.l && me) {
-        var at2 = where(G, p, 42);
-        pop(DROP + (l > 0 ? 'โดนกิน! เหลือ ' + l + ' ลูก' : 'ลูกแก้วหมดแล้ว'), 'sfx-hurt', at2.x, at2.y);
       }
       o.s = s; o.l = l;
     });
