@@ -841,5 +841,130 @@ body.qp-welcome #turn-pill{visibility:hidden}
 })();
 </script>
 
+<!-- points_shop: แต้มสะสม (คิดจากผลแพ้ชนะ เก็บในเครื่อง) + แถบโปรไฟล์ในเมนู + เหรียญ/ร้านค้าแบบจาง "เร็วๆ นี้" (ยังไม่ต่อหลังบ้าน) · add-on ไม่แตะฟิสิกส์ -->
+<style>
+#pf-strip{display:flex;align-items:center;gap:9px;padding:8px 10px;margin:0 0 8px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.22)}
+#pf-strip .pf-ball{width:38px;height:38px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,#fff 0 7%,#ffd28a 16%,#f08a24 52%,#7a2f05 100%);box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(0,0,0,.5)}
+#pf-strip .pf-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#pf-strip .pf-name{font-weight:800;font-size:14.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pf-strip .pf-rank{display:inline-block;font-size:10px;font-weight:700;color:#1a0c03;background:#fbbf24;border-radius:6px;padding:0 5px;line-height:15px;margin-left:5px;vertical-align:2px}
+#pf-strip .pf-pts{font-size:12px;color:#fcd34d;font-weight:700}
+#pf-strip .pf-pts small{color:var(--txt,#fdebd0);opacity:.65;font-weight:400}
+#pf-strip .pf-soon{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.42;filter:grayscale(.55);flex:none}
+#pf-strip .pf-coin{display:flex;align-items:center;gap:4px;padding:3px 9px 3px 4px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid #e8a23a;color:#fcd34d;font-weight:800;font-size:13px}
+#pf-strip .pf-soon span.lbl{font-size:9.5px;letter-spacing:.3px}
+#pf-shop{width:100%;margin:0 0 6px;padding:8px;border-radius:11px;border:1px dashed rgba(255,214,150,.4);background:rgba(255,255,255,.04);color:var(--txt,#fdebd0);font-family:inherit;font-size:12.5px;opacity:.55;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+#pf-shop b{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:#fcd34d}
+#shop-btn{position:relative;opacity:.38}
+#shop-btn .lk{position:absolute;right:-3px;bottom:-3px;font-size:10px;line-height:1;background:#1a0c03;border-radius:50%;padding:2px}
+#over-pts{margin:6px 0 2px;padding:7px 10px;border-radius:11px;background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.25);text-align:center;font-size:13px}
+#over-pts .d{font-size:18px;font-weight:800}
+#over-pts .up{color:#86efac}#over-pts .dn{color:#fca5a5}#over-pts .zero{color:#fde68a}
+#over-pts .rk{display:block;font-size:11.5px;opacity:.8;margin-top:1px}
+#over-pts .lvup{display:block;color:#fcd34d;font-weight:700;margin-top:2px}
+</style>
+<script>
+(function () {
+  var KEY = 'marble.pts';
+  var RANKS = [[0, 'มือใหม่'], [200, 'เด็กลานดิน'], [500, 'ขาประจำ'], [1000, 'มือดีด'], [2000, 'เซียนลูกแก้ว'], [4000, 'เจ้าสนาม']];
+  var MULT = { easy: 1, normal: 2, hard: 3 };
+  var COIN = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#f5b52a" stroke="#a8620f" stroke-width="1.5"/><circle cx="12" cy="12" r="7.3" fill="#5aa9f5" stroke="#fff3c4" stroke-width="1.2"/><circle cx="9.7" cy="9.5" r="1.4" fill="#fff"/></svg>';
+  function $(id) { return document.getElementById(id); }
+  function load() { try { var o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && typeof o.pts === 'number') return o; } catch (e) { } return { pts: 0, w: 0, l: 0, g: 0, best: 0 }; }
+  function save(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { } }
+  function rankOf(p) { var r = RANKS[0][1]; for (var i = 0; i < RANKS.length; i++) if (p >= RANKS[i][0]) r = RANKS[i][1]; return r; }
+  function nextOf(p) { for (var i = 0; i < RANKS.length; i++) if (p < RANKS[i][0]) return RANKS[i]; return null; }
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function soonToast() { try { window.game && game.toast('🛍️ ร้านค้าและเหรียญเปิดเร็วๆ นี้ — ตอนนี้เก็บแต้มไว้ก่อน'); } catch (e) { } }
+
+  // ---------- คิดแต้มเมื่อจบเกม ----------
+  function myIndex(G) {
+    for (var i = 0; i < G.players.length; i++) { try { if (G.isMe ? G.isMe(i) : i === 0) return i; } catch (e) { } }
+    return 0;
+  }
+  function scoreMatch(G) {
+    if (!G || !G.players || !G.players.length) return null;
+    var humans = 0; G.players.forEach(function (p) { if (!p.isBot) humans++; });
+    if (!G.online && humans > 1) return { skip: 'เล่นหลายคนบนเครื่องเดียว ไม่นับแต้ม' };
+    var ranked = G.players.slice().sort(function (a, b) { return (a.out - b.out) || (b.score - a.score); });
+    var me = G.players[myIndex(G)], pos = ranked.indexOf(me), n = ranked.length, d, why;
+    if (G.online) {
+      if (pos === 0) { d = 30; why = 'ชนะออนไลน์'; } else if (pos === n - 1) { d = -10; why = 'แพ้ออนไลน์'; } else { d = 5; why = 'อันดับ ' + (pos + 1); }
+    } else {
+      var m = MULT[G.botLevel] || 2, bots = n - 1, lvl = { easy: 'ง่าย', normal: 'ปกติ', hard: 'ยาก' }[G.botLevel] || '';
+      if (pos === 0) { d = Math.round(10 * m * (bots > 1 ? 1.5 : 1)); why = 'ชนะบอทระดับ' + lvl; }
+      else if (pos === n - 1) { d = -5 * m; why = 'แพ้บอทระดับ' + lvl; }
+      else { d = 0; why = 'อันดับ ' + (pos + 1); }
+    }
+    return { d: d, why: why, win: pos === 0 };
+  }
+  var counted = false;
+  function onOver() {
+    var G = window.game; if (!G || counted) return;
+    counted = true;
+    var r = scoreMatch(G), box = $('over-pts');
+    if (!box) { box = document.createElement('div'); box.id = 'over-pts'; var lst = $('over-list'); lst.parentNode.insertBefore(box, lst.nextSibling); }
+    if (!r) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    if (r.skip) { box.innerHTML = '<span class="rk">' + r.skip + '</span>'; return; }
+    var o = load(), before = o.pts, rkBefore = rankOf(before);
+    o.pts = Math.max(0, o.pts + r.d); o.g++; if (r.win) o.w++; else o.l++; if (o.pts > o.best) o.best = o.pts;
+    save(o);
+    var real = o.pts - before, cls = real > 0 ? 'up' : (real < 0 ? 'dn' : 'zero');
+    var nx = nextOf(o.pts), rk = rankOf(o.pts);
+    box.innerHTML = '<span class="d ' + cls + '">' + (real > 0 ? '+' : '') + real + ' แต้ม</span> · ' + r.why +
+      '<span class="rk">🏆 รวม ' + fmt(o.pts) + ' แต้ม · ' + rk + (nx ? ' · อีก ' + fmt(nx[0] - o.pts) + ' ถึง ' + nx[1] : '') + '</span>' +
+      (rk !== rkBefore && o.pts > before ? '<span class="lvup">🎉 เลื่อนขั้นเป็น "' + rk + '"</span>' : '');
+    renderStrip();
+  }
+
+  // ---------- แถบโปรไฟล์ในเมนู ----------
+  function renderStrip() {
+    var card = document.querySelector('#settings-modal .card'); if (!card) return;
+    var s = $('pf-strip');
+    if (!s) {
+      s = document.createElement('div'); s.id = 'pf-strip'; card.insertBefore(s, card.firstChild);
+      var b = document.createElement('button'); b.id = 'pf-shop'; b.type = 'button';
+      b.innerHTML = '🛍️ ร้านค้า · ลูกแก้ว · ลายสัก <b>เร็วๆ นี้</b>';
+      b.addEventListener('click', function (e) { e.stopPropagation(); soonToast(); });
+      card.insertBefore(b, s.nextSibling);
+    }
+    var o = load(), name = ''; try { name = localStorage.getItem('marble.online.name') || ''; } catch (e) { }
+    s.innerHTML = '<div class="pf-ball" aria-hidden="true"></div>' +
+      '<div class="pf-mid"><div class="pf-name">' + esc(name || 'ผู้เล่น') + '<span class="pf-rank">' + rankOf(o.pts) + '</span></div>' +
+      '<div class="pf-pts">🏆 ' + fmt(o.pts) + ' แต้ม <small>· ชนะ ' + o.w + ' / ' + o.g + ' เกม</small></div></div>' +
+      '<div class="pf-soon" title="เหรียญเปิดเร็วๆ นี้"><div class="pf-coin">' + COIN + '—</div><span class="lbl">เหรียญ · เร็วๆ นี้</span></div>';
+  }
+
+  function bind() {
+    var G = window.game, ov = $('over-modal'), sm = $('settings-modal'), bar = $('hud-bottom');
+    if (!G || !ov || !sm || !bar) return setTimeout(bind, 100);
+    // ปุ่มร้านค้าจางในแถบล่าง (ต่อจากปุ่มตั้งค่า)
+    if (!$('shop-btn')) {
+      var sb = document.createElement('button'); sb.id = 'shop-btn'; sb.className = 'ghost-btn'; sb.title = 'ร้านค้า (เร็วๆ นี้)';
+      sb.innerHTML = '🛍️<span class="lk">🔒</span>';
+      sb.addEventListener('click', function (e) { e.stopPropagation(); soonToast(); });
+      sb.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
+      sb.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+      var st = $('settings-btn'); bar.insertBefore(sb, st ? st.nextSibling : bar.firstChild);
+    }
+    renderStrip();
+    var wasOver = ov.classList.contains('show');
+    new MutationObserver(function () {
+      var now = ov.classList.contains('show');
+      if (now && !wasOver) setTimeout(onOver, 0);
+      wasOver = now;
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+    // เริ่มเกมใหม่ = นับแต้มได้อีกครั้ง
+    var oStart = G.startMatch;
+    if (oStart && !G._ptsPatched) { G._ptsPatched = true; G.startMatch = function () { counted = false; return oStart.apply(this, arguments); }; }
+    var wasSm = false;
+    new MutationObserver(function () { var now = sm.classList.contains('show'); if (now && !wasSm) renderStrip(); wasSm = now; }).observe(sm, { attributes: true, attributeFilter: ['class'] });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+</script>
+
 </body>
 </html>
