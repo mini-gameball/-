@@ -6,7 +6,7 @@
     "names": {
       "$name": {
         ".read": "auth != null",
-        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()))",
+        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()) || (data.child('uid').isString() && root.child('users').child(data.child('uid').val()).child('lastSeen').isNumber() && root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 2592000000 && (!root.child('wallet').child(data.child('uid').val()).child('coins').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coins').val() <= 0)))",
         ".validate": "newData.hasChildren(['uid','name']) && newData.child('uid').val() === auth.uid",
         "uid": { ".validate": "newData.isString()" },
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>') && newData.val().toLowerCase() === $name" },
@@ -18,7 +18,7 @@
 
     "users": {
       ".read": "auth != null && query.orderByChild === 'nameLower' && query.limitToFirst <= 12",
-      ".indexOn": ["nameLower"],
+      ".indexOn": ["nameLower", "lastSeen"],
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
         ".write": "auth != null && auth.uid === $uid",
