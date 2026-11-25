@@ -6,12 +6,13 @@
     "names": {
       "$name": {
         ".read": "auth != null",
-        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()) || (data.child('uid').isString() && root.child('users').child(data.child('uid').val()).child('lastSeen').isNumber() && root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 2592000000 && (!root.child('wallet').child(data.child('uid').val()).child('coins').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coins').val() <= 0)))",
+        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && !data.child('g').exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()) || (data.child('uid').isString() && root.child('users').child(data.child('uid').val()).child('lastSeen').isNumber() && root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 2592000000 && (!root.child('wallet').child(data.child('uid').val()).child('coins').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coins').val() <= 0)))",
         ".validate": "newData.hasChildren(['uid','name']) && newData.child('uid').val() === auth.uid",
         "uid": { ".validate": "newData.isString()" },
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>') && newData.val().toLowerCase() === $name" },
         "key": { ".validate": "newData.isString() && newData.val().length <= 64" },
         "createdAt": { ".validate": "newData.isNumber()" },
+        "g": { ".validate": "newData.val() === true && auth.token.email_verified === true" },
         "$other": { ".validate": false }
       }
     },
@@ -47,6 +48,21 @@
           "status": { ".validate": "newData.isString() && (data.exists() ? newData.val().matches(/^(pending|accepted|declined)$/) : newData.val() === 'pending')" },
           "$other": { ".validate": false }
         }
+      }
+    },
+
+    "pts": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['p','w','l','g','b','t']) && newData.child('t').val() === now && newData.child('w').val() + newData.child('l').val() === newData.child('g').val() && newData.child('b').val() >= newData.child('p').val() && newData.child('b').val() <= newData.child('g').val() * 5000 && (data.exists() ? (newData.child('g').val() > data.child('g').val() && (newData.child('g').val() - data.child('g').val()) <= 200 && now - data.child('t').val() >= 25000 * (newData.child('g').val() - data.child('g').val()) && newData.child('p').val() - data.child('p').val() <= 4400 * (newData.child('g').val() - data.child('g').val()) && newData.child('b').val() >= data.child('b').val()) : (newData.child('g').val() <= 5000 && newData.child('p').val() <= 4400 * newData.child('g').val()))",
+        "p": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "w": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "l": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "g": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "b": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "t": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
       }
     },
 
