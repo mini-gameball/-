@@ -86,6 +86,18 @@
       }
     },
 
+    "wallet": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": false }
+    },
+
+    "ledger": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": false }
+    },
+
+    "config": {
+      "economy": { ".read": "auth != null", ".write": false }
+    },
+
     "rooms": {
       "$rid": {
         ".read": "auth != null && data.child('members').child(auth.uid).exists()",
