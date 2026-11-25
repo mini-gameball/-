@@ -12,7 +12,7 @@
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>') && newData.val().toLowerCase() === $name" },
         "key": { ".validate": "newData.isString() && newData.val().length <= 64" },
         "createdAt": { ".validate": "newData.isNumber()" },
-        "g": { ".validate": "newData.val() === true && auth.token.email_verified === true" },
+        "g": { ".validate": "newData.val() === true && (auth.token.email_verified === true || auth.token.firebase.sign_in_provider === 'google.com' || auth.token.firebase.sign_in_provider === 'facebook.com' || auth.token.firebase.sign_in_provider === 'password')" },
         "$other": { ".validate": false }
       }
     },
