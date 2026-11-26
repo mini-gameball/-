@@ -137,7 +137,7 @@
             "present": { ".validate": "newData.isBoolean()" },
             "host": { ".validate": "newData.isBoolean()" },
             "cos": {
-              "m": { ".validate": "newData.isString() && newData.val().length <= 32 && (newData.val() === 'm_default' || root.child('wallet').child($uid).child('inv').child(newData.val()).exists())" },
+              "m": { ".validate": "newData.isString() && newData.val().length <= 32 && (newData.val() === 'm_default' || (newData.val().beginsWith('m_') && root.child('wallet').child($uid).child('inv').child(newData.val()).child('ad').val() > 0 && root.child('wallet').child($uid).child('inv').child(newData.val()).child('ax').val() > now))" },
               "fx": { ".validate": "newData.isString() && newData.val().length <= 32 && (newData.val() === 'none' || root.child('wallet').child($uid).child('inv').child(newData.val()).child('en').val() > 0)" },
               "fxLv": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 3 && newData.val() <= root.child('wallet').child($uid).child('inv').child(newData.parent().child('fx').val()).child('lv').val()" },
               "$other": { ".validate": false }
