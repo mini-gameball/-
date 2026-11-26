@@ -6,7 +6,7 @@
     "names": {
       "$name": {
         ".read": "auth != null",
-        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && !data.child('g').exists() && !root.child('nameKeys').child($name).exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()) || (!data.child('g').exists() && root.child('nameKeys').child($name).child('k').isString() && root.child('nameClaims').child($name).child(auth.uid).isString() && root.child('nameClaims').child($name).child(auth.uid).val() === root.child('nameKeys').child($name).child('k').val()) || (data.child('uid').isString() && root.child('users').child(data.child('uid').val()).child('lastSeen').isNumber() && root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 2592000000 && !root.child('wallet').child(data.child('uid').val()).child('paid').exists() && (!root.child('wallet').child(data.child('uid').val()).child('coinsT').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coinsT').val() <= 0) && (((!root.child('wallet').child(data.child('uid').val()).child('coins').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coins').val() <= 0) && !root.child('wallet').child(data.child('uid').val()).child('inv').exists()) || root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 7776000000)))",
+        ".write": "auth != null && $name.length <= 32 && (!data.exists() || data.child('uid').val() === auth.uid || (data.child('key').exists() && !data.child('g').exists() && !root.child('nameKeys').child($name).exists() && newData.child('key').exists() && data.child('key').val() === newData.child('key').val()) || (!data.child('g').exists() && root.child('nameKeys').child($name).child('k').isString() && root.child('nameClaims').child($name).child(auth.uid).isString() && root.child('nameClaims').child($name).child(auth.uid).val() === root.child('nameKeys').child($name).child('k').val()) || (data.child('uid').isString() && root.child('users').child(data.child('uid').val()).child('lastSeen').isNumber() && (root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 2592000000 || root.child('users').child(data.child('uid').val()).child('lastSeen').val() > now + 86400000) && !root.child('wallet').child(data.child('uid').val()).child('paid').exists() && (!root.child('wallet').child(data.child('uid').val()).child('coinsT').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coinsT').val() <= 0) && (((!root.child('wallet').child(data.child('uid').val()).child('coins').isNumber() || root.child('wallet').child(data.child('uid').val()).child('coins').val() <= 0) && !root.child('wallet').child(data.child('uid').val()).child('inv').exists()) || (root.child('users').child(data.child('uid').val()).child('lastSeen').val() < now - 7776000000 || root.child('users').child(data.child('uid').val()).child('lastSeen').val() > now + 86400000))))",
         ".validate": "newData.hasChildren(['uid','name']) && newData.child('uid').val() === auth.uid",
         "uid": { ".validate": "newData.isString()" },
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>') && newData.val().toLowerCase() === $name" },
@@ -46,7 +46,7 @@
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>') && (newData.val() === data.val() || root.child('names').child(newData.val().toLowerCase()).child('uid').val() === auth.uid)" },
         "nameLower": { ".validate": "newData.isString() && newData.val().length <= 32 && newData.val() === newData.parent().child('name').val().toLowerCase()" },
         "status": { ".validate": "newData.isString() && newData.val().matches(/^(online|ingame|offline)$/)" },
-        "lastSeen": { ".validate": "newData.isNumber()" },
+        "lastSeen": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
         "roomId": { ".validate": "newData.isString() && newData.val().length <= 64" },
         "fcmToken": { ".validate": "newData.isString() && newData.val().length <= 512" },
         "$other": { ".validate": false }
@@ -116,7 +116,7 @@
         },
         "startAt": {
           ".write": "auth != null && root.child('rooms').child($rid).child('host').val() === auth.uid",
-          ".validate": "newData.isNumber()"
+          ".validate": "newData.isNumber() && newData.val() >= now - 30000 && newData.val() <= now + 120000"
         },
         "config": {
           ".validate": "newData.hasChildren(['stage'])",
@@ -130,7 +130,7 @@
 
         "members": {
           "$uid": {
-            ".write": "auth != null && (root.child('rooms').child($rid).child('host').val() === auth.uid || (auth.uid === $uid && data.exists()))",
+            ".write": "auth != null && (root.child('rooms').child($rid).child('host').val() === auth.uid || (auth.uid === $uid && data.exists() && !root.child('bans').child(auth.uid).exists()))",
             ".validate": "newData.hasChildren(['name'])",
             "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16 && !newData.val().contains('<') && !newData.val().contains('>')" },
             "joined": { ".validate": "newData.isBoolean()" },
