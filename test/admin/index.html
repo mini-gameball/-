@@ -36,6 +36,7 @@ input,select,textarea{font:inherit;color:#fdebd0;background:rgba(0,0,0,.35);bord
 table{width:100%;border-collapse:collapse;font-size:12px}
 th,td{padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;vertical-align:top}
 td.num{text-align:right;white-space:nowrap}
+td.d{white-space:nowrap}
 .pos{color:#86efac}.neg{color:#fca5a5}
 .ok{color:#86efac}.bad{color:#fca5a5;font-weight:700}
 .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,.1);margin:1px 2px}
@@ -79,7 +80,10 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function fmt(n) { return String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-  function dt(t) { if (!t) return '-'; var d = new Date(t); return d.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'short', timeStyle: 'medium' }); }
+  function dtf(t) { if (!t) return '-'; return new Date(t).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'short', timeStyle: 'medium' }); }   // เต็ม (ใช้ในรายงานที่ส่งออก)
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  function sd(d) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d)); return m ? m[3] + '/' + m[2] : String(d); }   // วันสั้น 26/11
+  function dt(t) { if (!t) return '-'; var x = new Date(+t + 7 * 3600e3); return p2(x.getUTCDate()) + '/' + p2(x.getUTCMonth() + 1) + ' ' + p2(x.getUTCHours()) + ':' + p2(x.getUTCMinutes()) + ':' + p2(x.getUTCSeconds()); }   // เวลาไทย สั้น
   function msg(t) { var m = $('msg'); m.textContent = t; m.style.opacity = 1; clearTimeout(msg.t); msg.t = setTimeout(function () { m.style.opacity = 0; }, 2600); }
   function call(n, d) { return fns.httpsCallable(n, { timeout: 120000 })(d || {}).then(function (r) { return r.data; }); }
   function errText(e) { var c = String((e && (e.message || e.code)) || e); return /not-admin/.test(c) ? 'บัญชีนี้ไม่ใช่ผู้ดูแล' : /no-user/.test(c) ? 'ไม่พบผู้เล่น' : /need-reason/.test(c) ? 'ต้องใส่เหตุผล (อย่างน้อย 3 ตัวอักษร)' : /bad-amount/.test(c) ? 'จำนวนไม่ถูกต้อง' : 'ทำไม่สำเร็จ: ' + c; }
@@ -141,7 +145,7 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
         var st = r.stats[d] || {}, mi = st.minted || {}, bu = st.burned || {};
         var tm = Object.values(mi).reduce(function (a, b) { return a + b; }, 0), tb = Object.values(bu).reduce(function (a, b) { return a + b; }, 0);
         var det = Object.keys(mi).map(function (k) { return (RL[k] || k) + ' ' + fmt(mi[k]); }).concat(Object.keys(bu).map(function (k) { return (RL[k] || k) + ' −' + fmt(bu[k]); })).join(' · ');
-        return '<tr><td>' + d + '</td><td class="num pos">' + fmt(tm) + '</td><td class="num neg">' + fmt(tb) + '</td><td>' + esc(det) + '</td></tr>';
+        return '<tr><td class="d">' + sd(d) + '</td><td class="num pos">' + fmt(tm) + '</td><td class="num neg">' + fmt(tb) + '</td><td>' + esc(det) + '</td></tr>';
       }).join('') + '</table>';
       $('sus').innerHTML = r.rows.length ? r.rows.map(function (x) {
         return '<div class="it" data-uid="' + esc(x.uid) + '"><span class="sc ' + x.level + '">' + x.score + '</span><div style="flex:1"><div class="n">' + esc(x.name || '(ไม่มีชื่อ)') + (x.locked ? ' 🔒' : '') + '</div>' +
@@ -170,7 +174,7 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
     var acts = '<div class="card" style="margin-top:8px"><div class="row">' + (u.ban ? '<button class="b green" id="unlock">🔓 ปลดล็อก</button>' : '<input id="why" placeholder="เหตุผลที่ล็อก (ผู้เล่นจะเห็น)" style="flex:1"><button class="b red" id="lock">🔒 ล็อกบัญชี</button>') + '</div>' +
       '<div class="row" style="margin-top:6px"><input id="amt" type="number" min="1" placeholder="จำนวนเหรียญ" style="width:130px"><input id="why2" placeholder="เหตุผลที่ริบ" style="flex:1"><button class="b" id="revoke">➖ ริบเหรียญ</button></div>' +
       '<div class="row" style="margin-top:6px"><button class="b" id="copy">📋 คัดลอกรายงานหลักฐาน</button><button class="b" id="dl">⬇️ ดาวน์โหลดรายงาน</button></div></div>';
-    var au = u.audits.length ? '<table><tr><th>วัน</th><th>คะแนน</th><th>เหตุผล</th></tr>' + u.audits.map(function (x) { return '<tr><td>' + x.day + '</td><td>' + x.score + '</td><td>' + x.reasons.map(function (y) { return esc(y.t); }).join(' · ') + '</td></tr>'; }).join('') + '</table>' : '<div class="muted">ไม่เคยติดผลตรวจใน 14 วัน</div>';
+    var au = u.audits.length ? '<table><tr><th>วัน</th><th>คะแนน</th><th>เหตุผล</th></tr>' + u.audits.map(function (x) { return '<tr><td class="d">' + sd(x.day) + '</td><td>' + x.score + '</td><td>' + x.reasons.map(function (y) { return esc(y.t); }).join(' · ') + '</td></tr>'; }).join('') + '</table>' : '<div class="muted">ไม่เคยติดผลตรวจใน 14 วัน</div>';
     var sh = u.shared.length ? u.shared.map(function (x) { return '<span class="pill lnk" data-uid="' + esc(x.uid) + '" style="cursor:pointer">' + esc(x.name || x.uid.slice(0, 8)) + ' · ' + fmt(x.coins) + ' เหรียญ · ' + x.gm + ' เกม</span>'; }).join('') : '<span class="muted">ไม่มี</span>';
     var rf = (u.referral ? '<div>ถูกชวนโดย UID <span class="pill lnk" data-uid="' + esc(u.referral.by) + '" style="cursor:pointer">' + esc(u.referral.by.slice(0, 10)) + '…</span> เมื่อ ' + dt(u.referral.t) + (u.referral.void ? ' <span class="bad">(โมฆะ: ' + esc(u.referral.void) + ')</span>' : '') + '</div>' : '') +
       (u.refs.length ? '<div>ชวนมา ' + u.refs.length + ' คน: ' + u.refs.map(function (x) { return '<span class="pill lnk" data-uid="' + esc(x.uid) + '" style="cursor:pointer">' + esc(x.name || x.uid.slice(0, 8)) + ' · ' + esc(ST[x.st] || x.st) + ' · ' + (x.g || 0) + ' เกม' + (x.dk ? ' · ⚠ เครื่องเดียวกับผู้ชวน' : '') + '</span>'; }).join('') + '</div>' : '') || '<span class="muted">ไม่มี</span>';
@@ -183,7 +187,7 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
       if (e.item) det.push(e.item);
       if (e.why) det.push(e.why);
       if (e.friend) det.push('เพื่อน ' + String(e.friend).slice(0, 8));
-      return '<tr><td>' + dt(e.t) + '</td><td>' + esc(RL[e.r] || e.r) + '</td><td class="num ' + (e.d > 0 ? 'pos' : e.d < 0 ? 'neg' : '') + '">' + (e.d > 0 ? '+' : '') + fmt(e.d) + '</td><td class="num">' + (e.bal == null ? '' : fmt(e.bal)) + '</td><td>' + esc(det.join(' · ')) + '</td></tr>';
+      return '<tr><td class="d">' + dt(e.t) + '</td><td>' + esc(RL[e.r] || e.r) + '</td><td class="num ' + (e.d > 0 ? 'pos' : e.d < 0 ? 'neg' : '') + '">' + (e.d > 0 ? '+' : '') + fmt(e.d) + '</td><td class="num">' + (e.bal == null ? '' : fmt(e.bal)) + '</td><td>' + esc(det.join(' · ')) + '</td></tr>';
     }).join('') + '</table>';
     box.innerHTML = head + info + acts +
       '<h3>ผลตรวจย้อนหลัง 14 วัน</h3>' + au +
@@ -218,24 +222,24 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
   function report(u) {
     var w = u.wallet, a = u.acct || {}, L = [];
     L.push('รายงานบัญชีผู้เล่น — เกมดีดลูกแก้ว');
-    L.push('ออกรายงาน: ' + dt(Date.now()));
+    L.push('ออกรายงาน: ' + dtf(Date.now()));
     L.push('ชื่อผู้เล่น: ' + (u.name || '-') + '   UID: ' + u.uid);
-    L.push('สถานะ: ' + (u.ban ? 'ถูกระงับเมื่อ ' + dt(u.ban.t) + ' · เหตุผล: ' + u.ban.reason : 'ปกติ'));
-    L.push('สร้างบัญชี: ' + dt(a.created || w.created) + ' · เข้าล่าสุด: ' + dt(Math.max(a.lastRefresh || 0, a.lastSignIn || 0, u.lastSeen || 0)) + ' · ผูกบัญชี: ' + ((a.providers || []).join(', ') || 'ไม่ได้ผูก'));
+    L.push('สถานะ: ' + (u.ban ? 'ถูกระงับเมื่อ ' + dtf(u.ban.t) + ' · เหตุผล: ' + u.ban.reason : 'ปกติ'));
+    L.push('สร้างบัญชี: ' + dtf(a.created || w.created) + ' · เข้าล่าสุด: ' + dtf(Math.max(a.lastRefresh || 0, a.lastSignIn || 0, u.lastSeen || 0)) + ' · ผูกบัญชี: ' + ((a.providers || []).join(', ') || 'ไม่ได้ผูก'));
     L.push('เหรียญคงเหลือ: ' + fmt(w.coins) + ' · Lv ' + w.lv + ' · เกมทั้งหมด ' + fmt(w.gm) + ' · วันที่เล่น ' + fmt(w.dd));
     L.push('ตรวจยอด: ' + (u.check.match ? 'ยอดตรงกับสมุดบัญชี (' + fmt(u.check.ledgerSum) + ')' : 'ไม่ตรง — สมุดบัญชีรวม ' + fmt(u.check.ledgerSum) + ' แต่ยอดในกระเป๋า ' + fmt(w.coins)));
     L.push(''); L.push('ผลตรวจย้อนหลัง 14 วัน:');
     if (!u.audits.length) L.push('  - ไม่เคยติด');
     u.audits.forEach(function (x) { L.push('  ' + x.day + ' คะแนน ' + x.score + ': ' + x.reasons.map(function (y) { return y.t; }).join(' · ')); });
     L.push(''); L.push('บัญชีที่ใช้เครื่องเดียวกัน: ' + (u.shared.length ? u.shared.map(function (x) { return (x.name || x.uid) + ' (' + fmt(x.coins) + ' เหรียญ, ' + x.gm + ' เกม)'; }).join(', ') : 'ไม่มี'));
-    if (u.referral) L.push('ถูกชวนโดย UID: ' + u.referral.by + ' เมื่อ ' + dt(u.referral.t) + (u.referral.void ? ' (โมฆะ)' : ''));
+    if (u.referral) L.push('ถูกชวนโดย UID: ' + u.referral.by + ' เมื่อ ' + dtf(u.referral.t) + (u.referral.void ? ' (โมฆะ)' : ''));
     if (u.refs.length) L.push('ชวนเพื่อนมา ' + u.refs.length + ' คน: ' + u.refs.map(function (x) { return (x.name || x.uid) + ' [' + (ST[x.st] || x.st) + ', ' + (x.g || 0) + ' เกม' + (x.dk ? ', เครื่องเดียวกับผู้ชวน' : '') + ']'; }).join(', '));
     L.push(''); L.push('สมุดบัญชีเหรียญ (' + u.ledgerCount + ' รายการ' + (u.ledgerCount > u.ledger.length ? ', แสดงล่าสุด ' + u.ledger.length : '') + ')');
     L.push('วันเวลา | รายการ | จำนวน | คงเหลือ | รายละเอียด');
     u.ledger.forEach(function (e) {
       var det = [];
       if (e.mode) det.push(e.mode); if (typeof e.sec === 'number') det.push(e.sec + 's'); if (e.won) det.push('ชนะ'); if (e.ref) det.push('อ้างอิง ' + e.ref); if (e.item) det.push(e.item); if (e.why) det.push(e.why); if (e.friend) det.push('เพื่อน ' + e.friend);
-      L.push(dt(e.t) + ' | ' + (RL[e.r] || e.r) + ' | ' + (e.d > 0 ? '+' : '') + e.d + ' | ' + (e.bal == null ? '' : e.bal) + ' | ' + det.join(', '));
+      L.push(dtf(e.t) + ' | ' + (RL[e.r] || e.r) + ' | ' + (e.d > 0 ? '+' : '') + e.d + ' | ' + (e.bal == null ? '' : e.bal) + ' | ' + det.join(', '));
     });
     return L.join('\n');
   }
