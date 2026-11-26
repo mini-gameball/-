@@ -98,10 +98,14 @@
       "economy": { ".read": "auth != null", ".write": false }
     },
 
+    "bans": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": false }
+    },
+
     "rooms": {
       "$rid": {
         ".read": "auth != null && data.child('members').child(auth.uid).exists()",
-        ".write": "auth != null && ((!data.exists() && newData.child('host').val() === auth.uid && newData.child('members').child(auth.uid).exists()) || (!newData.exists() && data.child('host').val() === auth.uid))",
+        ".write": "auth != null && ((!data.exists() && newData.child('host').val() === auth.uid && newData.child('members').child(auth.uid).exists() && !root.child('bans').child(auth.uid).exists()) || (!newData.exists() && data.child('host').val() === auth.uid))",
         ".validate": "$rid.matches(/^[A-Za-z0-9_-]{1,64}$/) && newData.hasChildren(['host','status','members'])",
         "host": { ".validate": "newData.isString()" },
         "kind": { ".validate": "newData.isString() && newData.val().matches(/^(single|group)$/)" },
@@ -151,7 +155,7 @@
 
         "shots": {
           "$sid": {
-            ".write": "auth != null && !data.exists() && root.child('rooms').child($rid).child('status').val() === 'playing' && root.child('rooms').child($rid).child('members').child(auth.uid).child('joined').val() === true",
+            ".write": "auth != null && !data.exists() && root.child('rooms').child($rid).child('status').val() === 'playing' && root.child('rooms').child($rid).child('members').child(auth.uid).child('joined').val() === true && !root.child('bans').child(auth.uid).exists()",
             ".validate": "$sid.matches(/^[A-Za-z0-9_-]{1,64}$/) && newData.hasChildren(['by','pi','dx','dz','power']) && newData.child('by').val() === auth.uid",
             "by": { ".validate": "newData.isString()" },
             "pi": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5" },

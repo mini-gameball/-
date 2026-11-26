@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://asia-southeast1-marble-gameball.cloudfunctions.net; frame-src https://marble-gameball.firebaseapp.com https://accounts.google.com https://apis.google.com">
+<title>ผู้ดูแล · เกมดีดลูกแก้ว</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;background:#1c0e04;color:#fdebd0;font-size:14px;line-height:1.45}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#3b1d08,#2a1405);border-bottom:1px solid rgba(255,200,120,.25)}
+header h1{flex:1;margin:0;font-size:16px;color:#fcd34d}
+header .me{font-size:11px;opacity:.75;text-align:right}
+main{max-width:760px;margin:0 auto;padding:10px}
+.card{background:rgba(0,0,0,.28);border:1px solid rgba(255,214,150,.2);border-radius:14px;padding:12px;margin-bottom:10px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}
+.tab{flex:none;padding:7px 12px;border-radius:999px;border:1px solid rgba(251,191,36,.5);background:transparent;color:#fde68a;font:inherit;font-weight:700;cursor:pointer}
+.tab.on{background:linear-gradient(#f5b52a,#c97a12);color:#2a1503;border-color:#ffe1a6}
+button.b{padding:8px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.7);background:rgba(251,191,36,.16);color:#fcd34d;font:inherit;font-weight:700;cursor:pointer}
+button.b.red{border-color:#ef4444;background:#7f1d1d;color:#fff}
+button.b.green{border-color:#22c55e;background:#14532d;color:#fff}
+button.b:disabled{opacity:.5}
+input,select,textarea{font:inherit;color:#fdebd0;background:rgba(0,0,0,.35);border:1px solid rgba(255,214,150,.3);border-radius:10px;padding:8px 10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.tile{background:rgba(0,0,0,.3);border-radius:12px;padding:8px;text-align:center}
+.tile b{display:block;font-size:20px;color:#fcd34d}
+.tile span{font-size:11px;opacity:.8}
+.list .it{display:flex;gap:8px;align-items:flex-start;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer}
+.list .it:hover{background:rgba(255,255,255,.04)}
+.sc{flex:none;min-width:42px;text-align:center;font-weight:800;border-radius:8px;padding:2px 6px}
+.sc.high{background:#7f1d1d;color:#fecaca}.sc.mid{background:#78350f;color:#fde68a}
+.it .n{font-weight:700}.it .r{font-size:12px;opacity:.85}
+.muted{opacity:.7;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;vertical-align:top}
+td.num{text-align:right;white-space:nowrap}
+.pos{color:#86efac}.neg{color:#fca5a5}
+.ok{color:#86efac}.bad{color:#fca5a5;font-weight:700}
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,.1);margin:1px 2px}
+#user{display:none}
+#msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#111;color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;z-index:20;max-width:92vw}
+code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;word-break:break-all}
+.scroll{max-height:420px;overflow:auto}
+</style>
+</head>
+<body>
+<header><h1>🛡️ ผู้ดูแล · เกมดีดลูกแก้ว</h1><div class="me" id="me">กำลังเชื่อมต่อ...</div></header>
+<main>
+  <div id="gate" class="card" style="display:none"></div>
+  <div id="app" style="display:none">
+    <div class="tabs">
+      <button class="tab on" data-v="sum">ภาพรวม</button><button class="tab" data-v="sus">น่าสงสัย</button>
+      <button class="tab" data-v="find">ค้นหา</button><button class="tab" data-v="ban">ถูกระงับ</button>
+    </div>
+    <section id="v-sum">
+      <div class="card"><div class="row"><label>วันที่ตรวจ <input type="date" id="day"></label><button class="b" id="load">ดูผล</button><button class="b" id="run">ตรวจวันนี้ตอนนี้</button></div>
+        <div class="muted" style="margin-top:6px">ระบบตรวจอัตโนมัติทุกวัน 04:45 (ของเมื่อวาน) · คะแนน ≥ 50 = สูง · 25–49 = กลาง · ระบบชี้คนน่าสงสัย ไม่ได้ตัดสินเอง — ดูหลักฐานก่อนล็อกทุกครั้ง</div></div>
+      <div class="card"><div class="tiles" id="tiles"></div></div>
+      <div class="card"><b>เหรียญออก/เข้า 7 วัน</b><div class="scroll" id="stats"></div></div>
+    </section>
+    <section id="v-sus" style="display:none"><div class="card list" id="sus"></div></section>
+    <section id="v-find" style="display:none"><div class="card"><div class="row"><input id="q" placeholder="ชื่อผู้เล่น หรือ UID" style="flex:1"><button class="b" id="go">ค้นหา</button></div></div></section>
+    <section id="v-ban" style="display:none"><div class="card list" id="bans"></div></section>
+    <section id="user" class="card"></section>
+  </div>
+</main>
+<div id="msg"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+  var CFG = { apiKey: 'AIzaSyCHYFgrIcvWONHKt7DGqq2PBdLwxWftYCU', authDomain: 'marble-gameball.firebaseapp.com', databaseURL: 'https://marble-gameball-default-rtdb.asia-southeast1.firebasedatabase.app', projectId: 'marble-gameball', appId: '1:595949959968:web:80689a558f97afa69ef545' };
+  var app = firebase.apps.length ? firebase.app() : firebase.initializeApp(CFG);
+  var fns = app.functions('asia-southeast1');
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmt(n) { return String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function dt(t) { if (!t) return '-'; var d = new Date(t); return d.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'short', timeStyle: 'medium' }); }
+  function msg(t) { var m = $('msg'); m.textContent = t; m.style.opacity = 1; clearTimeout(msg.t); msg.t = setTimeout(function () { m.style.opacity = 0; }, 2600); }
+  function call(n, d) { return fns.httpsCallable(n, { timeout: 120000 })(d || {}).then(function (r) { return r.data; }); }
+  function errText(e) { var c = String((e && (e.message || e.code)) || e); return /not-admin/.test(c) ? 'บัญชีนี้ไม่ใช่ผู้ดูแล' : /no-user/.test(c) ? 'ไม่พบผู้เล่น' : /need-reason/.test(c) ? 'ต้องใส่เหตุผล (อย่างน้อย 3 ตัวอักษร)' : /bad-amount/.test(c) ? 'จำนวนไม่ถูกต้อง' : 'ทำไม่สำเร็จ: ' + c; }
+  function thDay(t) { return new Date(t + 7 * 3600000).toISOString().slice(0, 10); }
+  var RL = { match: 'จบเกม', levelup: 'เลเวลอัป', daily: 'รางวัลรายวัน', link: 'ผูกบัญชี', welcome: 'โบนัสต้อนรับ', buy: 'ซื้อของ', upgrade: 'อัปเกรดเอฟเฟกต์', refill: 'เติมพลังเอฟเฟกต์', ref: 'ชวนเพื่อน', refjoin: 'เพื่อนชวนมา', admin: 'ผู้ดูแลริบ' };
+  var ST = { joined: 'กดลิงก์แล้ว', qualified: 'เล่นครบ (+100)', lv: 'ถึง Lv 5 (+200)', cap: 'เกินโควตาเดือน', void: 'ไม่นับ', locked: 'ผู้ชวนถูกล็อก' };
+
+  // ---------- เข้าสู่ระบบ ----------
+  firebase.auth().onAuthStateChanged(function (u) {
+    if (!u) {
+      $('me').textContent = 'ยังไม่ได้เข้าสู่ระบบ';
+      $('gate').style.display = ''; $('app').style.display = 'none';
+      $('gate').innerHTML = '<b>เข้าสู่ระบบด้วยบัญชีเจ้าของเกม</b><p class="muted">ถ้าเปิดหน้านี้ในเบราว์เซอร์เดียวกับที่เล่นเกม (ผูกบัญชีแล้ว) จะเข้าให้อัตโนมัติ</p><button class="b" id="gsign">เข้าสู่ระบบด้วย Google</button>';
+      $('gsign').onclick = function () { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (e) { msg('เข้าสู่ระบบไม่สำเร็จ: ' + (e.code || e.message)); }); };
+      return;
+    }
+    $('me').innerHTML = esc(u.displayName || 'ผู้เล่น') + '<br>' + esc(u.uid.slice(0, 10)) + '…';
+    call('adminWho').then(function (r) {
+      if (!r.admin) {
+        $('gate').style.display = ''; $('app').style.display = 'none';
+        $('gate').innerHTML = '<b>บัญชีนี้ยังไม่ใช่ผู้ดูแล</b><p>UID ของบัญชีนี้: <code id="myuid">' + esc(u.uid) + '</code> <button class="b" id="cp">คัดลอก</button></p>' +
+          '<p class="muted">ตั้งเป็นผู้ดูแล: Firebase Console → Realtime Database → Data → เพิ่ม <code>config</code> → <code>admins</code> → ชื่อ = UID ข้างบน · ค่า = <code>true</code> (boolean) แล้วกดรีเฟรชหน้านี้</p>';
+        $('cp').onclick = function () { navigator.clipboard && navigator.clipboard.writeText(u.uid).then(function () { msg('คัดลอกแล้ว'); }); };
+        return;
+      }
+      $('gate').style.display = 'none'; $('app').style.display = '';
+      loadList();
+    }).catch(function (e) { $('gate').style.display = ''; $('gate').innerHTML = '<b>ต่อเซิร์ฟเวอร์ไม่ได้</b><p class="muted">' + esc(errText(e)) + '</p>'; });
+  });
+
+  // ---------- แท็บ ----------
+  document.querySelectorAll('.tab').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.toggle('on', x === b); });
+      ['sum', 'sus', 'find', 'ban'].forEach(function (v) { $('v-' + v).style.display = v === b.dataset.v ? '' : 'none'; });
+      $('user').style.display = 'none';
+    };
+  });
+  $('day').value = thDay(Date.now() - 86400000);
+  $('load').onclick = function () { loadList(); };
+  $('run').onclick = function () {
+    var b = $('run'); b.disabled = true; b.textContent = 'กำลังตรวจ...';
+    call('adminRunAudit', {}).then(function (r) { $('day').value = r.day; msg('ตรวจแล้ว: น่าสงสัย ' + r.flagged + ' บัญชี'); loadList(); })
+      .catch(function (e) { msg(errText(e)); }).then(function () { b.disabled = false; b.textContent = 'ตรวจวันนี้ตอนนี้'; });
+  };
+  $('go').onclick = function () { var q = $('q').value.trim(); if (q) openUser({ q: q }); };
+  $('q').onkeydown = function (e) { if (e.key === 'Enter') $('go').click(); };
+
+  var LAST = null;
+  function loadList() {
+    call('adminList', { day: $('day').value }).then(function (r) {
+      LAST = r;
+      var s = r.sum || {};
+      $('tiles').innerHTML = [['ผู้เล่นที่ใช้งาน', s.active], ['น่าสงสัย', s.flagged], ['ความเสี่ยงสูง', s.high], ['เหรียญออก', s.minted], ['เหรียญเข้า (ใช้จ่าย)', s.burned]]
+        .map(function (x) { return '<div class="tile"><b>' + (x[1] == null ? '-' : fmt(x[1])) + '</b><span>' + x[0] + '</span></div>'; }).join('') +
+        (r.sum ? '' : '<div class="muted">ยังไม่มีผลตรวจของวันนี้ — กด "ตรวจวันนี้ตอนนี้"</div>');
+      var days = Object.keys(r.stats || {}).sort().reverse();
+      $('stats').innerHTML = '<table><tr><th>วัน</th><th>ออก (แจก)</th><th>เข้า (ใช้)</th><th>รายละเอียด</th></tr>' + days.map(function (d) {
+        var st = r.stats[d] || {}, mi = st.minted || {}, bu = st.burned || {};
+        var tm = Object.values(mi).reduce(function (a, b) { return a + b; }, 0), tb = Object.values(bu).reduce(function (a, b) { return a + b; }, 0);
+        var det = Object.keys(mi).map(function (k) { return (RL[k] || k) + ' ' + fmt(mi[k]); }).concat(Object.keys(bu).map(function (k) { return (RL[k] || k) + ' −' + fmt(bu[k]); })).join(' · ');
+        return '<tr><td>' + d + '</td><td class="num pos">' + fmt(tm) + '</td><td class="num neg">' + fmt(tb) + '</td><td>' + esc(det) + '</td></tr>';
+      }).join('') + '</table>';
+      $('sus').innerHTML = r.rows.length ? r.rows.map(function (x) {
+        return '<div class="it" data-uid="' + esc(x.uid) + '"><span class="sc ' + x.level + '">' + x.score + '</span><div style="flex:1"><div class="n">' + esc(x.name || '(ไม่มีชื่อ)') + (x.locked ? ' 🔒' : '') + '</div>' +
+          '<div class="r">' + x.reasons.map(function (y) { return esc(y.t); }).join(' · ') + '</div><div class="muted">เหรียญ ' + fmt(x.coins) + ' · Lv ' + x.lv + ' · ' + x.games + ' เกม · ได้วันนั้น ' + fmt(x.minted) + '</div></div></div>';
+      }).join('') : '<div class="muted">ไม่มีบัญชีน่าสงสัยในวันที่ ' + esc(r.day) + '</div>';
+      $('bans').innerHTML = r.locked.length ? r.locked.map(function (x) {
+        return '<div class="it" data-uid="' + esc(x.uid) + '"><span class="sc high">🔒</span><div style="flex:1"><div class="n">' + esc(x.name || '(ไม่มีชื่อ)') + '</div><div class="r">' + esc(x.reason) + '</div><div class="muted">' + dt(x.t) + '</div></div></div>';
+      }).join('') : '<div class="muted">ยังไม่มีบัญชีที่ถูกระงับ</div>';
+      document.querySelectorAll('.list .it').forEach(function (el) { el.onclick = function () { openUser({ uid: el.dataset.uid }); }; });
+    }).catch(function (e) { msg(errText(e)); });
+  }
+
+  // ---------- รายคน + หลักฐาน ----------
+  var U = null;
+  function openUser(q) {
+    var box = $('user'); box.style.display = 'block'; box.innerHTML = '<div class="muted">กำลังโหลด...</div>'; box.scrollIntoView({ behavior: 'smooth' });
+    call('adminUser', q).then(function (u) { U = u; renderUser(); }).catch(function (e) { box.innerHTML = '<div class="bad">' + esc(errText(e)) + '</div>'; });
+  }
+  function renderUser() {
+    var u = U, w = u.wallet, a = u.acct || {}, box = $('user');
+    var head = '<div class="row" style="justify-content:space-between"><div><b style="font-size:16px">' + esc(u.name || '(ไม่มีชื่อ)') + '</b> ' + (u.ban ? '<span class="pill" style="background:#7f1d1d">🔒 ถูกระงับ</span>' : '') + '<div class="muted">UID <code>' + esc(u.uid) + '</code></div></div><button class="b" id="ux">ปิด</button></div>';
+    var info = '<div class="tiles" style="margin:8px 0"><div class="tile"><b>' + fmt(w.coins) + '</b><span>เหรียญ</span></div><div class="tile"><b>' + w.lv + '</b><span>เลเวล</span></div><div class="tile"><b>' + fmt(w.gm) + '</b><span>เกมทั้งหมด</span></div><div class="tile"><b>' + fmt(w.dd) + '</b><span>วันที่เล่น</span></div></div>' +
+      '<div>ตรวจยอด: ' + (u.check.match ? '<span class="ok">✓ ยอดตรงกับสมุดบัญชี</span>' : '<span class="bad">✗ ไม่ตรง — สมุดบัญชีรวม ' + fmt(u.check.ledgerSum) + ' แต่มี ' + fmt(w.coins) + '</span>') + '</div>' +
+      '<div class="muted">สร้างบัญชี ' + dt(a.created || w.created) + ' · เข้าล่าสุด ' + dt(Math.max(a.lastRefresh || 0, a.lastSignIn || 0, u.lastSeen || 0)) + ' · ผูกบัญชี: ' + esc((a.providers || []).join(', ') || 'ไม่ได้ผูก') + '</div>' +
+      (u.ban ? '<div class="bad" style="margin-top:4px">ระงับเมื่อ ' + dt(u.ban.t) + ' · เหตุผล: ' + esc(u.ban.reason) + '</div>' : '');
+    var acts = '<div class="card" style="margin-top:8px"><div class="row">' + (u.ban ? '<button class="b green" id="unlock">🔓 ปลดล็อก</button>' : '<input id="why" placeholder="เหตุผลที่ล็อก (ผู้เล่นจะเห็น)" style="flex:1"><button class="b red" id="lock">🔒 ล็อกบัญชี</button>') + '</div>' +
+      '<div class="row" style="margin-top:6px"><input id="amt" type="number" min="1" placeholder="จำนวนเหรียญ" style="width:130px"><input id="why2" placeholder="เหตุผลที่ริบ" style="flex:1"><button class="b" id="revoke">➖ ริบเหรียญ</button></div>' +
+      '<div class="row" style="margin-top:6px"><button class="b" id="copy">📋 คัดลอกรายงานหลักฐาน</button><button class="b" id="dl">⬇️ ดาวน์โหลดรายงาน</button></div></div>';
+    var au = u.audits.length ? '<table><tr><th>วัน</th><th>คะแนน</th><th>เหตุผล</th></tr>' + u.audits.map(function (x) { return '<tr><td>' + x.day + '</td><td>' + x.score + '</td><td>' + x.reasons.map(function (y) { return esc(y.t); }).join(' · ') + '</td></tr>'; }).join('') + '</table>' : '<div class="muted">ไม่เคยติดผลตรวจใน 14 วัน</div>';
+    var sh = u.shared.length ? u.shared.map(function (x) { return '<span class="pill lnk" data-uid="' + esc(x.uid) + '" style="cursor:pointer">' + esc(x.name || x.uid.slice(0, 8)) + ' · ' + fmt(x.coins) + ' เหรียญ · ' + x.gm + ' เกม</span>'; }).join('') : '<span class="muted">ไม่มี</span>';
+    var rf = (u.referral ? '<div>ถูกชวนโดย UID <span class="pill lnk" data-uid="' + esc(u.referral.by) + '" style="cursor:pointer">' + esc(u.referral.by.slice(0, 10)) + '…</span> เมื่อ ' + dt(u.referral.t) + (u.referral.void ? ' <span class="bad">(โมฆะ: ' + esc(u.referral.void) + ')</span>' : '') + '</div>' : '') +
+      (u.refs.length ? '<div>ชวนมา ' + u.refs.length + ' คน: ' + u.refs.map(function (x) { return '<span class="pill lnk" data-uid="' + esc(x.uid) + '" style="cursor:pointer">' + esc(x.name || x.uid.slice(0, 8)) + ' · ' + esc(ST[x.st] || x.st) + ' · ' + (x.g || 0) + ' เกม' + (x.dk ? ' · ⚠ เครื่องเดียวกับผู้ชวน' : '') + '</span>'; }).join('') + '</div>' : '') || '<span class="muted">ไม่มี</span>';
+    var led = u.ledger.slice().reverse();
+    var lt = '<table><tr><th>เวลา</th><th>รายการ</th><th class="num">จำนวน</th><th class="num">คงเหลือ</th><th>รายละเอียด</th></tr>' + led.map(function (e) {
+      var det = [];
+      if (e.mode) det.push(e.mode === 'online' ? 'ออนไลน์' : e.mode === 'bot' ? 'กับบอท' : 'เครื่องเดียว');
+      if (typeof e.sec === 'number') det.push(e.sec + ' วิ');
+      if (e.won) det.push('ชนะ');
+      if (e.item) det.push(e.item);
+      if (e.why) det.push(e.why);
+      if (e.friend) det.push('เพื่อน ' + String(e.friend).slice(0, 8));
+      return '<tr><td>' + dt(e.t) + '</td><td>' + esc(RL[e.r] || e.r) + '</td><td class="num ' + (e.d > 0 ? 'pos' : e.d < 0 ? 'neg' : '') + '">' + (e.d > 0 ? '+' : '') + fmt(e.d) + '</td><td class="num">' + (e.bal == null ? '' : fmt(e.bal)) + '</td><td>' + esc(det.join(' · ')) + '</td></tr>';
+    }).join('') + '</table>';
+    box.innerHTML = head + info + acts +
+      '<h3>ผลตรวจย้อนหลัง 14 วัน</h3>' + au +
+      '<h3>บัญชีที่ใช้เครื่องเดียวกัน</h3>' + sh +
+      '<h3>ชวนเพื่อน</h3>' + rf +
+      '<h3>สมุดบัญชี (' + fmt(u.ledgerCount) + ' รายการ' + (u.ledgerCount > u.ledger.length ? ' · แสดงล่าสุด ' + u.ledger.length : '') + ')</h3><div class="scroll">' + lt + '</div>';
+    $('ux').onclick = function () { box.style.display = 'none'; };
+    box.querySelectorAll('.lnk').forEach(function (el) { el.onclick = function () { openUser({ uid: el.dataset.uid }); }; });
+    if ($('lock')) $('lock').onclick = function () {
+      var r = $('why').value.trim(); if (r.length < 3) return msg('ใส่เหตุผลก่อน');
+      if (!confirm('ล็อกบัญชี "' + (u.name || u.uid) + '"?\nเหตุผล: ' + r)) return;
+      call('adminLock', { uid: u.uid, reason: r }).then(function () { msg('ล็อกแล้ว'); openUser({ uid: u.uid }); loadList(); }).catch(function (e) { msg(errText(e)); });
+    };
+    if ($('unlock')) $('unlock').onclick = function () {
+      if (!confirm('ปลดล็อก "' + (u.name || u.uid) + '"?')) return;
+      call('adminUnlock', { uid: u.uid, reason: 'ปลดล็อกจากหน้าผู้ดูแล' }).then(function () { msg('ปลดล็อกแล้ว'); openUser({ uid: u.uid }); loadList(); }).catch(function (e) { msg(errText(e)); });
+    };
+    $('revoke').onclick = function () {
+      var n = Math.floor(+$('amt').value || 0), r = $('why2').value.trim();
+      if (!(n > 0)) return msg('ใส่จำนวนเหรียญ'); if (r.length < 3) return msg('ใส่เหตุผลก่อน');
+      if (!confirm('ริบ ' + fmt(n) + ' เหรียญจาก "' + (u.name || u.uid) + '"?\nเหตุผล: ' + r)) return;
+      call('adminRevoke', { uid: u.uid, amount: n, reason: r }).then(function (x) { msg('ริบแล้ว ' + fmt(x.took) + ' เหรียญ'); openUser({ uid: u.uid }); }).catch(function (e) { msg(errText(e)); });
+    };
+    $('copy').onclick = function () { var t = report(u); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { msg('คัดลอกรายงานแล้ว'); }, function () { msg('คัดลอกไม่ได้ — ใช้ปุ่มดาวน์โหลดแทน'); }); };
+    $('dl').onclick = function () {
+      var b = new Blob([report(u)], { type: 'text/plain;charset=utf-8' }), a2 = document.createElement('a');
+      a2.href = URL.createObjectURL(b); a2.download = 'report-' + (u.name || u.uid).replace(/[^\w฀-๿-]/g, '_') + '-' + thDay(Date.now()) + '.txt'; a2.click();
+      setTimeout(function () { URL.revokeObjectURL(a2.href); }, 2000);
+    };
+  }
+  window.__report = function (u) { return report(u); };
+  function report(u) {
+    var w = u.wallet, a = u.acct || {}, L = [];
+    L.push('รายงานบัญชีผู้เล่น — เกมดีดลูกแก้ว');
+    L.push('ออกรายงาน: ' + dt(Date.now()));
+    L.push('ชื่อผู้เล่น: ' + (u.name || '-') + '   UID: ' + u.uid);
+    L.push('สถานะ: ' + (u.ban ? 'ถูกระงับเมื่อ ' + dt(u.ban.t) + ' · เหตุผล: ' + u.ban.reason : 'ปกติ'));
+    L.push('สร้างบัญชี: ' + dt(a.created || w.created) + ' · เข้าล่าสุด: ' + dt(Math.max(a.lastRefresh || 0, a.lastSignIn || 0, u.lastSeen || 0)) + ' · ผูกบัญชี: ' + ((a.providers || []).join(', ') || 'ไม่ได้ผูก'));
+    L.push('เหรียญคงเหลือ: ' + fmt(w.coins) + ' · Lv ' + w.lv + ' · เกมทั้งหมด ' + fmt(w.gm) + ' · วันที่เล่น ' + fmt(w.dd));
+    L.push('ตรวจยอด: ' + (u.check.match ? 'ยอดตรงกับสมุดบัญชี (' + fmt(u.check.ledgerSum) + ')' : 'ไม่ตรง — สมุดบัญชีรวม ' + fmt(u.check.ledgerSum) + ' แต่ยอดในกระเป๋า ' + fmt(w.coins)));
+    L.push(''); L.push('ผลตรวจย้อนหลัง 14 วัน:');
+    if (!u.audits.length) L.push('  - ไม่เคยติด');
+    u.audits.forEach(function (x) { L.push('  ' + x.day + ' คะแนน ' + x.score + ': ' + x.reasons.map(function (y) { return y.t; }).join(' · ')); });
+    L.push(''); L.push('บัญชีที่ใช้เครื่องเดียวกัน: ' + (u.shared.length ? u.shared.map(function (x) { return (x.name || x.uid) + ' (' + fmt(x.coins) + ' เหรียญ, ' + x.gm + ' เกม)'; }).join(', ') : 'ไม่มี'));
+    if (u.referral) L.push('ถูกชวนโดย UID: ' + u.referral.by + ' เมื่อ ' + dt(u.referral.t) + (u.referral.void ? ' (โมฆะ)' : ''));
+    if (u.refs.length) L.push('ชวนเพื่อนมา ' + u.refs.length + ' คน: ' + u.refs.map(function (x) { return (x.name || x.uid) + ' [' + (ST[x.st] || x.st) + ', ' + (x.g || 0) + ' เกม' + (x.dk ? ', เครื่องเดียวกับผู้ชวน' : '') + ']'; }).join(', '));
+    L.push(''); L.push('สมุดบัญชีเหรียญ (' + u.ledgerCount + ' รายการ' + (u.ledgerCount > u.ledger.length ? ', แสดงล่าสุด ' + u.ledger.length : '') + ')');
+    L.push('วันเวลา | รายการ | จำนวน | คงเหลือ | รายละเอียด');
+    u.ledger.forEach(function (e) {
+      var det = [];
+      if (e.mode) det.push(e.mode); if (typeof e.sec === 'number') det.push(e.sec + 's'); if (e.won) det.push('ชนะ'); if (e.ref) det.push('อ้างอิง ' + e.ref); if (e.item) det.push(e.item); if (e.why) det.push(e.why); if (e.friend) det.push('เพื่อน ' + e.friend);
+      L.push(dt(e.t) + ' | ' + (RL[e.r] || e.r) + ' | ' + (e.d > 0 ? '+' : '') + e.d + ' | ' + (e.bal == null ? '' : e.bal) + ' | ' + det.join(', '));
+    });
+    return L.join('\n');
+  }
+})();
+</script>
+</body>
+</html>
