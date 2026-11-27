@@ -61,6 +61,10 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
       <div class="card"><div class="row"><label>วันที่ตรวจ <input type="date" id="day"></label><button class="b" id="load">ดูผล</button><button class="b" id="run">ตรวจวันนี้ตอนนี้</button></div>
         <div class="muted" style="margin-top:6px">ระบบตรวจอัตโนมัติทุกวัน 04:45 (ของเมื่อวาน) · คะแนน ≥ 50 = สูง · 25–49 = กลาง · ระบบชี้คนน่าสงสัย ไม่ได้ตัดสินเอง — ดูหลักฐานก่อนล็อกทุกครั้ง</div></div>
       <div class="card"><div class="tiles" id="tiles"></div></div>
+      <div class="card" id="rk-card"><b>ระบบอันดับ</b>
+        <div id="rk-st" style="margin:6px 0">กำลังโหลด...</div>
+        <div class="row"><label>วันจันทร์เริ่มฤดู <input type="date" id="rk-day"></label><button class="b" id="rk-save" disabled>บันทึกวันเริ่ม</button><button class="b" id="rk-clear" style="display:none">ยกเลิกวันเริ่ม</button></div>
+        <div class="muted" style="margin-top:6px">ฤดูเริ่มวันจันทร์ 00:00 เวลาไทย · แต้มทุกคนจะเริ่ม 0 ในวันนั้น (แต้มช่วงทดลองไม่นับ) · ตั้งได้เฉพาะช่วงทดลอง และต้องเป็นวันจันทร์หน้าเป็นต้นไป · หลังฤดูเริ่มแล้วเปลี่ยนวันไม่ได้</div></div>
       <div class="card"><b>เหรียญออก/เข้า 7 วัน</b><div class="scroll" id="stats"></div></div>
       <div class="card"><b>เหรียญออก แยกออนไลน์ / บอท 7 วัน</b><div class="scroll" id="split"></div>
         <div class="muted" style="margin-top:6px">นับจากสมุดบัญชี (ย้อนหลังได้) · จบเกม + เลเวลอัปที่เกิดในเกมนั้น · บอท = เกมกับบอท (รวมเล่นหลายคนเครื่องเดียว) · อื่นๆ = รางวัลรายวัน โบนัสต้อนรับ ผูกบัญชี ชวนเพื่อน</div></div>
@@ -90,7 +94,8 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
   function dt(t) { if (!t) return '-'; var x = new Date(+t + 7 * 3600e3); return p2(x.getUTCDate()) + '/' + p2(x.getUTCMonth() + 1) + ' ' + p2(x.getUTCHours()) + ':' + p2(x.getUTCMinutes()) + ':' + p2(x.getUTCSeconds()); }   // เวลาไทย สั้น
   function msg(t) { var m = $('msg'); m.textContent = t; m.style.opacity = 1; clearTimeout(msg.t); msg.t = setTimeout(function () { m.style.opacity = 0; }, 2600); }
   function call(n, d) { return fns.httpsCallable(n, { timeout: 120000 })(d || {}).then(function (r) { return r.data; }); }
-  function errText(e) { var c = String((e && (e.message || e.code)) || e); return /not-admin/.test(c) ? 'บัญชีนี้ไม่ใช่ผู้ดูแล' : /no-user/.test(c) ? 'ไม่พบผู้เล่น' : /need-reason/.test(c) ? 'ต้องใส่เหตุผล (อย่างน้อย 3 ตัวอักษร)' : /bad-amount/.test(c) ? 'จำนวนไม่ถูกต้อง' : 'ทำไม่สำเร็จ: ' + c; }
+  function errText(e) { var c = String((e && (e.message || e.code)) || e); return /not-admin/.test(c) ? 'บัญชีนี้ไม่ใช่ผู้ดูแล' : /no-user/.test(c) ? 'ไม่พบผู้เล่น' : /need-reason/.test(c) ? 'ต้องใส่เหตุผล (อย่างน้อย 3 ตัวอักษร)' : /bad-amount/.test(c) ? 'จำนวนไม่ถูกต้อง' :
+    /bad-start/.test(c) ? 'วันเริ่มต้องเป็นวันจันทร์' : /past/.test(c) ? 'วันเริ่มต้องเป็นวันจันทร์หน้าเป็นต้นไป' : /started/.test(c) ? 'ฤดูเริ่มแล้ว เปลี่ยนวันเริ่มไม่ได้' : 'ทำไม่สำเร็จ: ' + c; }
   function thDay(t) { return new Date(t + 7 * 3600000).toISOString().slice(0, 10); }
   var RL = { match: 'จบเกม', levelup: 'เลเวลอัป', daily: 'รางวัลรายวัน', link: 'ผูกบัญชี', welcome: 'โบนัสต้อนรับ', buy: 'ซื้อของ', upgrade: 'อัปเกรดเอฟเฟกต์', refill: 'เติมพลังเอฟเฟกต์', ref: 'ชวนเพื่อน', refjoin: 'เพื่อนชวนมา', admin: 'ผู้ดูแลริบ' };
   var ST = { joined: 'กดลิงก์แล้ว', qualified: 'เล่นครบ (+100)', lv: 'ถึง Lv 5 (+200)', cap: 'เกินโควตาเดือน', void: 'ไม่นับ', locked: 'ผู้ชวนถูกล็อก' };
@@ -114,7 +119,7 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
         return;
       }
       $('gate').style.display = 'none'; $('app').style.display = '';
-      loadList();
+      loadList(); loadRank();
     }).catch(function (e) { $('gate').style.display = ''; $('gate').innerHTML = '<b>ต่อเซิร์ฟเวอร์ไม่ได้</b><p class="muted">' + esc(errText(e)) + '</p>'; });
   });
 
@@ -149,6 +154,42 @@ code{font-size:12px;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:5px;
       return '<tr><td class="d">' + sd(d) + '</td>' + cell(x.online, 'onl') + cell(x.bot, 'bot') + '<td class="num">' + fmt(x.other) + '</td></tr>';
     }).join('') + '<tr><td class="d"><b>รวม</b></td><td class="num onl"><b>' + fmt(T.on) + '</b></td><td class="num bot"><b>' + fmt(T.bot) + '</b></td><td class="num"><b>' + fmt(T.oth) + '</b></td></tr></table>';
   }
+
+  // ---------- v5.22 ระบบอันดับ: สถานะจาก getMe().rankCfg · ตั้งวันเริ่มฤดูด้วย adminRankStart (ยืนยัน 2 ครั้ง) ----------
+  function fdate(d) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d)); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(d); }
+  function isMon(d) { return /^\d{4}-\d{2}-\d{2}$/.test(d) && new Date(d + 'T00:00:00Z').getUTCDay() === 1; }
+  function nextMon() { var t = Date.now() + 7 * 3600000, x = new Date(t), add = ((8 - x.getUTCDay()) % 7) || 7; return new Date(t + add * 86400000).toISOString().slice(0, 10); }
+  function renderRank(rc) {
+    var st = $('rk-st'), save = $('rk-save'), clr = $('rk-clear'), day = $('rk-day');
+    clr.style.display = 'none'; save.disabled = true; day.disabled = true;
+    if (!rc) { st.textContent = 'เซิร์ฟเวอร์ยังไม่รองรับระบบอันดับ (ต้อง deploy เซิร์ฟเวอร์รุ่น v5.22 ก่อน)'; return; }
+    var txt = !rc.on ? 'ปิดอยู่ (config/economy/rank/on = false) · ' : '';
+    if (rc.pre) {
+      txt += rc.start ? 'ช่วงทดลอง · ฤดูแรกจะเริ่มวันจันทร์ที่ ' + fdate(rc.start) + ' 00:00 (เวลาไทย)' : 'ช่วงทดลอง · ยังไม่ได้ตั้งวันเริ่มฤดู';
+      save.disabled = false; day.disabled = false; day.min = nextMon(); if (!day.value) day.value = rc.start || nextMon();
+      if (rc.start) clr.style.display = '';
+    } else txt += 'เริ่มฤดู ' + fdate(rc.start) + ' แล้ว';
+    st.textContent = txt;
+  }
+  function loadRank() {
+    call('getMe').then(function (r) { renderRank(r && r.rankCfg); }).catch(function (e) { $('rk-st').textContent = 'โหลดสถานะไม่สำเร็จ: ' + errText(e); });
+  }
+  function setStart(v) {
+    var b = $('rk-save'); b.disabled = true;
+    return call('adminRankStart', { start: v }).then(function (r) { msg(r.start ? 'ตั้งวันเริ่มฤดูแล้ว: ' + fdate(r.start) : 'ยกเลิกวันเริ่มแล้ว (ช่วงทดลอง)'); loadRank(); })
+      .catch(function (e) { msg(errText(e)); b.disabled = false; });
+  }
+  $('rk-save').onclick = function () {
+    var v = $('rk-day').value;
+    if (!isMon(v)) return msg('ต้องเลือกวันจันทร์');
+    if (!confirm('ตั้งวันเริ่มฤดูเป็นวันจันทร์ที่ ' + fdate(v) + ' 00:00 (เวลาไทย)?\n\nแต้มทุกคนจะเริ่ม 0 ในวันนั้น')) return;
+    if (!confirm('ยืนยันอีกครั้ง\n\nแต้มทุกคนจะเริ่ม 0 ในวันนั้น (แต้มช่วงทดลองไม่นับ)\nเมื่อฤดูเริ่มแล้วจะเปลี่ยนวันเริ่มไม่ได้')) return;
+    setStart(v);
+  };
+  $('rk-clear').onclick = function () {
+    if (!confirm('ยกเลิกวันเริ่มฤดู? ระบบจะอยู่ในช่วงทดลองต่อจนกว่าจะตั้งวันใหม่')) return;
+    setStart('');
+  };
 
   var LAST = null;
   function loadList() {
