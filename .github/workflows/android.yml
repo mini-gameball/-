@@ -58,7 +58,7 @@ jobs:
           gh release delete android-test -y --cleanup-tag || true
           gh release create android-test "$APK" --prerelease --target android \
             --title "แอป Android รุ่นทดสอบ (เกม v${{ steps.web.outputs.ver }} · build ${{ github.run_number }})" \
-            --notes "ดาวน์โหลดไฟล์ .apk ด้านล่างบนมือถือ Android แล้วติดตั้ง (ครั้งแรกต้องอนุญาตติดตั้งแอปที่ไม่รู้จัก) · รุ่นทดสอบ ยังล็อกอิน Google ไม่ได้"
+            --notes "ดาวน์โหลดไฟล์ .apk ด้านล่างบนมือถือ Android แล้วติดตั้ง (ครั้งแรกต้องอนุญาตติดตั้งแอปที่ไม่รู้จัก) · รุ่นทดสอบ (ล็อกอิน Google แบบเลือกบัญชีในเครื่อง)"
       - name: Report status
         if: always()
         run: |
