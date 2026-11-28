@@ -21,6 +21,46 @@
   // สลับออกจากแอป → หยุดเสียง/วงรอบเกมตามปกติของเบราว์เซอร์ (visibilitychange) · กลับมา → ขอจอไม่ดับใหม่
   try { var A = P().App; if (A && A.addListener) A.addListener('appStateChange', function (s) { if (s && s.isActive) awake(); }); } catch (e) { }
 
+  // เสียงพากย์: WebView ของ Android ไม่มีเสียงอ่าน (speechSynthesis ไม่ออกเสียง) → ทำ speechSynthesis ตัวแทน ส่งไปเสียงอ่านของมือถือ (Android TTS)
+  //  ผ่าน @capacitor-community/text-to-speech · เกมเรียกใช้เหมือนบนเว็บทุกอย่าง (getVoices / speak / cancel / speaking)
+  (function () {
+    var T = P().TextToSpeech; if (!T || !T.speak) return;
+    var voices = [], cur = 0, thai = null;
+    function on(o) { return function (t, f) { (o._l[t] = o._l[t] || []).push(f); }; }
+    function off(o) { return function (t, f) { var a = o._l[t]; if (a) { var i = a.indexOf(f); if (i >= 0) a.splice(i, 1); } }; }
+    function fire(o, t, ev) { try { if (typeof o['on' + t] === 'function') o['on' + t](ev); (o._l[t] || []).slice().forEach(function (f) { try { f(ev); } catch (e) { } }); } catch (e) { } }
+    function U(text) { this.text = String(text == null ? '' : text); this.lang = ''; this.voice = null; this.rate = 1; this.pitch = 1; this.volume = 1; this.onstart = this.onend = this.onerror = null; this._l = {}; this.addEventListener = on(this); this.removeEventListener = off(this); }
+    function clamp(x, a, b, d) { x = +x; return isFinite(x) ? Math.max(a, Math.min(b, x)) : d; }
+    var S = { speaking: false, pending: false, paused: false, onvoiceschanged: null, _l: {} };
+    S.addEventListener = on(S); S.removeEventListener = off(S);
+    S.getVoices = function () { return voices.slice(); };
+    S.speak = function (u) {
+      if (!u || !u.text) return;
+      var id = ++cur; S.speaking = true;
+      fire(u, 'start', { type: 'start', utterance: u });
+      T.speak({ text: u.text, lang: (u.voice && u.voice.lang) || u.lang || 'th-TH', rate: clamp(u.rate, 0.1, 4, 1), pitch: clamp(u.pitch, 0.1, 2, 1), volume: clamp(u.volume, 0, 1, 1), queueStrategy: 0 })
+        .then(function () { if (id === cur) S.speaking = false; fire(u, 'end', { type: 'end', utterance: u }); },
+          function (e) { if (id === cur) S.speaking = false; fire(u, 'error', { type: 'error', error: String((e && e.message) || e), utterance: u }); });
+    };
+    S.cancel = function () { cur++; S.speaking = false; S.pending = false; try { T.stop().catch(function () { }); } catch (e) { } };
+    S.pause = function () { }; S.resume = function () { };
+    // เช็กว่ามือถือมีเสียงไทยไหม (รอเครื่องอ่านพร้อมก่อน: stop() ผ่าน = พร้อม) · มี → เสียงไทย 1 ตัว ให้มือถือเลือกเสียงตามที่ตั้งไว้ · ไม่มี → บอกเกมว่าไม่มีเสียงไทย (เกมเงียบเอง)
+    function probe(n) {
+      T.stop().then(function () { return T.isLanguageSupported({ lang: 'th-TH' }); }).then(function (r) {
+        var ok = !!(r && r.supported); if (ok === thai) return; thai = ok;
+        voices = [{ name: 'Android TTS', lang: ok ? 'th-TH' : 'en-US', localService: true, default: true, voiceURI: ok ? 'android-tts-th' : 'android-tts-en' }];
+        fire(S, 'voiceschanged', { type: 'voiceschanged' });
+      }, function () { if (n < 40) setTimeout(function () { probe(n + 1); }, 500); });
+    }
+    try {
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: S });
+      Object.defineProperty(window, 'SpeechSynthesisUtterance', { configurable: true, writable: true, value: U });
+      probe(0);
+      // กลับเข้าแอป (เช่น เพิ่งไปโหลดเสียงไทยในตั้งค่ามือถือ) → เช็กใหม่
+      var A2 = P().App; if (A2 && A2.addListener) A2.addListener('appStateChange', function (s) { if (s && s.isActive) probe(0); });
+    } catch (e) { }
+  })();
+
   // ล็อกอิน Google ในแอป: Google บล็อกหน้าต่างล็อกอินใน WebView → ใช้หน้าเลือกบัญชีของ Android (native) แล้วส่ง idToken ให้ Firebase JS เดิม
   //  ห่อเฉพาะ provider google.com ของ linkWithPopup / signInWithPopup / reauthenticateWithPopup · อย่างอื่น (Facebook/รหัสผ่าน) ทำงานเหมือนเว็บ
   function nativeGoogleCred() {
