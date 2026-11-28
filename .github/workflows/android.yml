@@ -34,7 +34,10 @@ jobs:
         id: web
         run: |
           set -eo pipefail
-          VER=$(python3 scripts/prepare-www.py site www)
+          # ข้อความ commit มี [web-test] → ใช้เว็บหน้าทดสอบ (test/index.html) · ปกติใช้เว็บจริง (index.html)
+          PAGE=index.html
+          if [ "${{ contains(github.event.head_commit.message, '[web-test]') }}" = "true" ]; then PAGE=test/index.html; fi
+          VER=$(python3 scripts/prepare-www.py site www "$PAGE")
           echo "ver=$VER" >> "$GITHUB_OUTPUT"
           echo "game version $VER"
       - name: Install Capacitor
