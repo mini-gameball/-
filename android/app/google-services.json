@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "595949959968",
+    "firebase_url": "https://marble-gameball-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "marble-gameball",
+    "storage_bucket": "marble-gameball.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595949959968:android:90e6a8d551981aac9ef545",
+        "android_client_info": {
+          "package_name": "io.github.minigameball.marble"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "595949959968-apofevjt9ajbil1f045i335vil452tdk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQVEsMNuglpIYh5_uU4mhf09DlKBNyyz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "595949959968-apofevjt9ajbil1f045i335vil452tdk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
