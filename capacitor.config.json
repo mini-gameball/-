@@ -13,5 +13,9 @@
         "google.com"
       ]
     }
+  },
+  "server": {
+    "hostname": "mini-gameball.github.io",
+    "androidScheme": "https"
   }
 }
