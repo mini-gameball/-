@@ -1,0 +1,66 @@
+name: android-test-apk
+# build APK รุ่นทดสอบจากเว็บเกมล่าสุดบน main · รันเมื่อ push branch android หรือกดสั่งเอง
+on:
+  push:
+    branches: [android]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: site
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Prepare web files
+        id: web
+        run: |
+          set -eo pipefail
+          VER=$(python3 scripts/prepare-www.py site www)
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          echo "game version $VER"
+      - name: Install Capacitor
+        run: npm ci --no-audit --no-fund
+      - name: Sync Android
+        run: npx cap sync android
+      - name: Build APK
+        env:
+          APP_VERSION_CODE: ${{ github.run_number }}
+          APP_VERSION_NAME: ${{ steps.web.outputs.ver }}-test.${{ github.run_number }}
+        run: |
+          set -o pipefail
+          cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee ../build.log
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          APK=marble-flick-test-${{ steps.web.outputs.ver }}-${{ github.run_number }}.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$APK"
+          gh release delete android-test -y --cleanup-tag || true
+          gh release create android-test "$APK" --prerelease --target android \
+            --title "แอป Android รุ่นทดสอบ (เกม v${{ steps.web.outputs.ver }} · build ${{ github.run_number }})" \
+            --notes "ดาวน์โหลดไฟล์ .apk ด้านล่างบนมือถือ Android แล้วติดตั้ง (ครั้งแรกต้องอนุญาตติดตั้งแอปที่ไม่รู้จัก) · รุ่นทดสอบ ยังล็อกอิน Google ไม่ได้"
+      - name: Report status
+        if: always()
+        run: |
+          mkdir -p /tmp/ci && cd /tmp/ci
+          echo "run=${{ github.run_number }} status=${{ job.status }} ver=${{ steps.web.outputs.ver }} sha=${{ github.sha }} time=$(date -u +%FT%TZ)" > STATUS.txt
+          [ -f "$GITHUB_WORKSPACE/build.log" ] && tail -n 300 "$GITHUB_WORKSPACE/build.log" > build-tail.log || echo "no build.log" > build-tail.log
+          git init -q && git checkout -q -b android-ci
+          git config user.name "android-ci" && git config user.email "android-ci@users.noreply.github.com"
+          git add . && git commit -qm "ci run ${{ github.run_number }}: ${{ job.status }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" android-ci

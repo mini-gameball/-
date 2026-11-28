@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.minigameball.marble",
+  "appName": "ดีดลูกแก้ว",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#3b2a1a"
+  }
+}
