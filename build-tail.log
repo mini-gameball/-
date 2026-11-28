@@ -1,0 +1,300 @@
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preDebugBuild UP-TO-DATE
+> Task :capacitor-app:preBuild UP-TO-DATE
+> Task :capacitor-app:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-keep-awake:preBuild UP-TO-DATE
+> Task :capacitor-community-keep-awake:preDebugBuild UP-TO-DATE
+> Task :capacitor-android:writeDebugAarMetadata
+> Task :capacitor-app:writeDebugAarMetadata
+> Task :app:javaPreCompileDebug
+> Task :capacitor-community-text-to-speech:preBuild UP-TO-DATE
+> Task :capacitor-community-text-to-speech:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-keep-awake:writeDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-text-to-speech:writeDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
+> Task :capacitor-firebase-authentication:preBuild UP-TO-DATE
+> Task :capacitor-firebase-authentication:preDebugBuild UP-TO-DATE
+> Task :capacitor-firebase-authentication:writeDebugAarMetadata
+> Task :capacitor-android:processDebugNavigationResources
+> Task :capacitor-app:processDebugNavigationResources
+> Task :capacitor-community-keep-awake:processDebugNavigationResources
+> Task :capacitor-community-text-to-speech:processDebugNavigationResources
+> Task :capacitor-cordova-android-plugins:processDebugNavigationResources
+> Task :app:checkDebugAarMetadata
+> Task :capacitor-firebase-authentication:processDebugNavigationResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugResValues
+> Task :app:compileDebugNavigationResources
+> Task :app:processDebugGoogleServices
+> Task :capacitor-android:generateDebugResValues
+> Task :capacitor-android:generateDebugResources
+> Task :capacitor-android:packageDebugResources
+> Task :capacitor-app:generateDebugResValues
+> Task :capacitor-app:generateDebugResources
+> Task :capacitor-app:packageDebugResources
+> Task :capacitor-community-keep-awake:generateDebugResValues
+> Task :capacitor-community-keep-awake:generateDebugResources
+> Task :capacitor-community-keep-awake:packageDebugResources
+> Task :capacitor-community-text-to-speech:generateDebugResValues
+> Task :capacitor-community-text-to-speech:generateDebugResources
+> Task :capacitor-community-text-to-speech:packageDebugResources
+> Task :capacitor-cordova-android-plugins:generateDebugResValues
+> Task :capacitor-cordova-android-plugins:generateDebugResources
+> Task :capacitor-cordova-android-plugins:packageDebugResources
+> Task :capacitor-firebase-authentication:generateDebugResValues
+> Task :capacitor-firebase-authentication:generateDebugResources
+> Task :capacitor-firebase-authentication:packageDebugResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :capacitor-android:extractDeepLinksDebug
+> Task :capacitor-app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :capacitor-community-keep-awake:extractDeepLinksDebug
+> Task :capacitor-community-text-to-speech:extractDeepLinksDebug
+> Task :capacitor-app:processDebugManifest
+> Task :capacitor-cordova-android-plugins:extractDeepLinksDebug
+> Task :capacitor-community-keep-awake:processDebugManifest
+> Task :capacitor-android:processDebugManifest
+> Task :capacitor-community-text-to-speech:processDebugManifest
+> Task :capacitor-firebase-authentication:extractDeepLinksDebug
+> Task :capacitor-cordova-android-plugins:processDebugManifest
+> Task :capacitor-firebase-authentication:processDebugManifest
+> Task :capacitor-android:compileDebugLibraryResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :capacitor-app:compileDebugLibraryResources
+> Task :capacitor-android:parseDebugLocalResources
+> Task :capacitor-app:parseDebugLocalResources
+> Task :capacitor-community-keep-awake:compileDebugLibraryResources
+> Task :app:processDebugManifestForPackage
+> Task :capacitor-community-text-to-speech:compileDebugLibraryResources
+> Task :capacitor-community-keep-awake:parseDebugLocalResources
+> Task :capacitor-community-text-to-speech:parseDebugLocalResources
+> Task :capacitor-android:generateDebugRFile
+> Task :capacitor-community-keep-awake:generateDebugRFile
+> Task :capacitor-app:generateDebugRFile
+> Task :capacitor-community-text-to-speech:generateDebugRFile
+> Task :capacitor-cordova-android-plugins:compileDebugLibraryResources
+> Task :capacitor-firebase-authentication:compileDebugLibraryResources
+> Task :capacitor-cordova-android-plugins:parseDebugLocalResources
+> Task :capacitor-cordova-android-plugins:generateDebugRFile
+> Task :capacitor-android:javaPreCompileDebug
+> Task :capacitor-firebase-authentication:parseDebugLocalResources
+> Task :capacitor-app:javaPreCompileDebug
+
+> Task :capacitor-android:compileDebugJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :capacitor-firebase-authentication:generateDebugRFile
+> Task :capacitor-android:bundleLibCompileToJarDebug
+> Task :capacitor-app:compileDebugJavaWithJavac
+> Task :capacitor-app:bundleLibCompileToJarDebug
+> Task :capacitor-community-keep-awake:javaPreCompileDebug
+> Task :capacitor-cordova-android-plugins:javaPreCompileDebug
+> Task :capacitor-community-text-to-speech:javaPreCompileDebug
+> Task :app:processDebugResources
+> Task :capacitor-community-keep-awake:compileDebugJavaWithJavac
+> Task :capacitor-community-keep-awake:bundleLibCompileToJarDebug
+
+> Task :capacitor-community-text-to-speech:compileDebugJavaWithJavac
+Note: /home/runner/work/-/-/node_modules/@capacitor-community/text-to-speech/android/src/main/java/com/getcapacitor/community/tts/TextToSpeech.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/runner/work/-/-/node_modules/@capacitor-community/text-to-speech/android/src/main/java/com/getcapacitor/community/tts/TextToSpeech.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :capacitor-cordova-android-plugins:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-community-text-to-speech:bundleLibCompileToJarDebug
+> Task :capacitor-cordova-android-plugins:bundleLibCompileToJarDebug
+> Task :capacitor-firebase-authentication:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+
+> Task :capacitor-firebase-authentication:compileDebugJavaWithJavac
+Note: /home/runner/work/-/-/node_modules/@capacitor-firebase/authentication/android/src/main/java/io/capawesome/capacitorjs/plugins/firebase/authentication/FirebaseAuthentication.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/runner/work/-/-/node_modules/@capacitor-firebase/authentication/android/src/main/java/io/capawesome/capacitorjs/plugins/firebase/authentication/FirebaseAuthentication.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-firebase-authentication:bundleLibCompileToJarDebug
+> Task :capacitor-android:mergeDebugShaders
+> Task :app:compileDebugJavaWithJavac
+> Task :capacitor-android:compileDebugShaders NO-SOURCE
+> Task :capacitor-android:generateDebugAssets UP-TO-DATE
+> Task :capacitor-android:mergeDebugAssets
+> Task :capacitor-app:mergeDebugShaders
+> Task :capacitor-app:compileDebugShaders NO-SOURCE
+> Task :capacitor-app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-app:mergeDebugAssets
+> Task :capacitor-community-keep-awake:mergeDebugShaders
+> Task :capacitor-community-keep-awake:compileDebugShaders NO-SOURCE
+> Task :capacitor-community-keep-awake:generateDebugAssets UP-TO-DATE
+> Task :capacitor-community-keep-awake:mergeDebugAssets
+> Task :capacitor-community-text-to-speech:mergeDebugShaders
+> Task :capacitor-community-text-to-speech:compileDebugShaders NO-SOURCE
+> Task :capacitor-community-text-to-speech:generateDebugAssets UP-TO-DATE
+> Task :capacitor-community-text-to-speech:mergeDebugAssets
+> Task :capacitor-cordova-android-plugins:mergeDebugShaders
+> Task :capacitor-cordova-android-plugins:compileDebugShaders NO-SOURCE
+> Task :capacitor-cordova-android-plugins:generateDebugAssets UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeDebugAssets
+> Task :capacitor-firebase-authentication:mergeDebugShaders
+> Task :capacitor-firebase-authentication:compileDebugShaders NO-SOURCE
+> Task :capacitor-firebase-authentication:generateDebugAssets UP-TO-DATE
+> Task :capacitor-firebase-authentication:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :capacitor-community-keep-awake:bundleLibRuntimeToJarDebug
+> Task :capacitor-community-text-to-speech:bundleLibRuntimeToJarDebug
+> Task :capacitor-firebase-authentication:bundleLibRuntimeToJarDebug
+> Task :app:compressDebugAssets
+> Task :capacitor-app:bundleLibRuntimeToJarDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarDebug
+> Task :app:desugarDebugFileDependencies
+> Task :capacitor-android:bundleLibRuntimeToJarDebug
+> Task :app:dexBuilderDebug
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-android:processDebugJavaRes
+> Task :capacitor-app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-keep-awake:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-text-to-speech:processDebugJavaRes NO-SOURCE
+> Task :capacitor-cordova-android-plugins:processDebugJavaRes NO-SOURCE
+> Task :capacitor-firebase-authentication:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-keep-awake:bundleLibRuntimeToDirDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :app:mergeDebugJavaResource
+> Task :app:mergeDebugGlobalSynthetics
+> Task :capacitor-community-text-to-speech:bundleLibRuntimeToDirDebug
+> Task :capacitor-app:bundleLibRuntimeToDirDebug
+> Task :capacitor-firebase-authentication:bundleLibRuntimeToDirDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToDirDebug
+> Task :capacitor-android:bundleLibRuntimeToDirDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectOnly
+> Task :capacitor-app:mergeDebugJniLibFolders
+> Task :capacitor-app:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectOnly
+> Task :capacitor-community-keep-awake:mergeDebugJniLibFolders
+> Task :capacitor-community-keep-awake:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-community-keep-awake:copyDebugJniLibsProjectOnly
+> Task :capacitor-community-text-to-speech:mergeDebugJniLibFolders
+> Task :capacitor-community-text-to-speech:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-community-text-to-speech:copyDebugJniLibsProjectOnly
+> Task :capacitor-cordova-android-plugins:mergeDebugJniLibFolders
+> Task :capacitor-cordova-android-plugins:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectOnly
+> Task :capacitor-firebase-authentication:mergeDebugJniLibFolders
+> Task :capacitor-firebase-authentication:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-firebase-authentication:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :capacitor-android:checkDebugAarMetadata
+> Task :capacitor-android:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectAndLocalJars
+> Task :app:mergeLibDexDebug
+> Task :app:mergeExtDexDebug
+> Task :capacitor-android:extractDebugAnnotations
+> Task :capacitor-android:extractDeepLinksForAarDebug
+> Task :capacitor-android:mergeDebugGeneratedProguardFiles
+> Task :capacitor-android:mergeDebugConsumerProguardFiles
+> Task :capacitor-android:prepareDebugArtProfile
+> Task :capacitor-android:prepareLintJarForPublish
+> Task :capacitor-android:mergeDebugJavaResource
+> Task :capacitor-app:checkDebugAarMetadata
+> Task :capacitor-android:syncDebugLibJars
+> Task :capacitor-android:bundleDebugAar
+> Task :capacitor-android:assembleDebug
+> Task :capacitor-app:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-app:extractDebugAnnotations
+> Task :capacitor-app:extractDeepLinksForAarDebug
+> Task :capacitor-app:mergeDebugGeneratedProguardFiles
+> Task :capacitor-app:mergeDebugConsumerProguardFiles
+> Task :capacitor-app:prepareDebugArtProfile
+> Task :capacitor-app:prepareLintJarForPublish
+> Task :capacitor-app:mergeDebugJavaResource
+> Task :capacitor-community-keep-awake:checkDebugAarMetadata
+> Task :capacitor-app:syncDebugLibJars
+> Task :capacitor-app:bundleDebugAar
+> Task :capacitor-app:assembleDebug
+> Task :capacitor-community-keep-awake:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-community-keep-awake:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-community-keep-awake:extractDebugAnnotations
+> Task :capacitor-community-keep-awake:extractDeepLinksForAarDebug
+> Task :capacitor-community-keep-awake:mergeDebugGeneratedProguardFiles
+> Task :capacitor-community-keep-awake:mergeDebugConsumerProguardFiles
+> Task :capacitor-community-keep-awake:prepareDebugArtProfile
+> Task :capacitor-community-keep-awake:prepareLintJarForPublish
+> Task :capacitor-community-keep-awake:mergeDebugJavaResource
+> Task :capacitor-community-text-to-speech:checkDebugAarMetadata
+> Task :capacitor-community-keep-awake:syncDebugLibJars
+> Task :capacitor-community-keep-awake:bundleDebugAar
+> Task :capacitor-community-keep-awake:assembleDebug
+> Task :capacitor-community-text-to-speech:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-community-text-to-speech:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-community-text-to-speech:extractDebugAnnotations
+> Task :capacitor-community-text-to-speech:extractDeepLinksForAarDebug
+> Task :capacitor-community-text-to-speech:mergeDebugGeneratedProguardFiles
+> Task :capacitor-community-text-to-speech:mergeDebugConsumerProguardFiles
+> Task :capacitor-community-text-to-speech:prepareDebugArtProfile
+> Task :capacitor-community-text-to-speech:prepareLintJarForPublish
+> Task :capacitor-community-text-to-speech:mergeDebugJavaResource
+> Task :capacitor-cordova-android-plugins:checkDebugAarMetadata
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+> Task :capacitor-community-text-to-speech:syncDebugLibJars
+> Task :capacitor-community-text-to-speech:bundleDebugAar
+> Task :capacitor-community-text-to-speech:assembleDebug
+> Task :capacitor-cordova-android-plugins:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-cordova-android-plugins:extractDebugAnnotations
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug
+> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:mergeDebugJavaResource
+> Task :capacitor-firebase-authentication:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:syncDebugLibJars
+> Task :capacitor-cordova-android-plugins:bundleDebugAar
+> Task :capacitor-cordova-android-plugins:assembleDebug
+> Task :capacitor-firebase-authentication:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-firebase-authentication:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-firebase-authentication:extractDebugAnnotations
+> Task :capacitor-firebase-authentication:extractDeepLinksForAarDebug
+> Task :capacitor-firebase-authentication:mergeDebugGeneratedProguardFiles
+> Task :capacitor-firebase-authentication:mergeDebugConsumerProguardFiles
+> Task :capacitor-firebase-authentication:prepareDebugArtProfile
+> Task :capacitor-firebase-authentication:prepareLintJarForPublish
+> Task :capacitor-firebase-authentication:mergeDebugJavaResource
+> Task :capacitor-firebase-authentication:syncDebugLibJars
+> Task :capacitor-firebase-authentication:bundleDebugAar
+> Task :capacitor-firebase-authentication:assembleDebug
+
+[Incubating] Problems report is available at: file:///home/runner/work/-/-/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 21s
+215 actionable tasks: 215 executed
