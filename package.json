@@ -7,10 +7,11 @@
     "sync": "cap sync android"
   },
   "dependencies": {
+    "@capacitor-community/keep-awake": "8.0.1",
+    "@capacitor-firebase/authentication": "^8.6.0",
     "@capacitor/android": "8.6.3",
     "@capacitor/app": "8.1.2",
-    "@capacitor/core": "8.6.3",
-    "@capacitor-community/keep-awake": "8.0.1"
+    "@capacitor/core": "8.6.3"
   },
   "devDependencies": {
     "@capacitor/cli": "8.6.3"

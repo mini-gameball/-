@@ -25,6 +25,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Check Firebase config
+        run: |
+          # ล็อกอิน Google แบบ native ต้องมีไฟล์นี้ ไม่มี = แอปเด้งตอนเปิด → หยุดก่อน ไม่ทับ APK ตัวที่ใช้ได้
+          test -s android/app/google-services.json || { echo "missing android/app/google-services.json" | tee build.log; exit 1; }
+          grep -q '"io.github.minigameball.marble"' android/app/google-services.json || { echo "google-services.json: wrong package" | tee build.log; exit 1; }
       - name: Prepare web files
         id: web
         run: |

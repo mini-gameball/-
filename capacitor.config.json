@@ -5,5 +5,13 @@
   "android": {
     "allowMixedContent": false,
     "backgroundColor": "#3b2a1a"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "google.com"
+      ]
+    }
   }
 }
